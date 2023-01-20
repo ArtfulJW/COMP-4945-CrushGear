@@ -40,23 +40,40 @@ public class Preloader : MonoBehaviour
             
             switch (str){
                 case "-server":
-                    // Load Server with IP and port
-                    server = GetComponent<Server>();
-                    server.initServer(stats[0], Convert.ToInt32(stats[1]));
+                    try {
+                        // Load Server with IP and port
+                        server = GetComponent<Server>();
+                        server.initServer(stats[0], Convert.ToInt32(stats[1]));
+                    } catch (Exception e) {
+                        Console.WriteLine(e.ToString());
+                    }
+                    
                     break;
                 case "-client-host":
-                    // Load Client with Server
-                    // break; REENABLE TO PREVENT SWITCH-CASE PASS THROUGH
-                    server = GetComponent<Server>();
-                    server.initServer(stats[0], Convert.ToInt32(stats[1]));
-                    // Load client with IP and port
-                    client = GetComponent<Client>();
-                    client.initClient(stats[0], Convert.ToInt32(stats[1]));
+                    try {
+                        // Load Server with IP and port
+                        server = GetComponent<Server>();
+                        server.initServer(stats[0], Convert.ToInt32(stats[1]));
+                    } catch (Exception e) {
+                        Console.WriteLine(e.ToString());
+                    }
+                    try {
+                        // Load client with IP and port
+                        client = GetComponent<Client>();
+                        client.initClient(stats[0], Convert.ToInt32(stats[1]));
+                    } catch (Exception e) {
+                        Console.WriteLine(e.ToString());
+                    }
+                    
                     break;
                 default:
-                    // Load client with IP and port
-                    client = GetComponent<Client>();
-                    client.initClient(stats[0], Convert.ToInt32(stats[1]));
+                    try {
+                        // Load client with IP and port
+                        client = GetComponent<Client>();
+                        client.initClient(stats[0], Convert.ToInt32(stats[1]));
+                    } catch (Exception e) {
+                        Console.WriteLine(e.ToString());
+                    }
                     break;
             }
         }
