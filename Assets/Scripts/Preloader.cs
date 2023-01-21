@@ -13,9 +13,13 @@ public class Preloader : MonoBehaviour
         string[] stats = new string[2];
         // Receive IP and port
         Console.WriteLine("Enter IP:\n> ");
-        stats[0] = Console.ReadLine();
+        //TODO REMOVE
+        stats[0] = "127.0.0.1"; 
+        //stats[0] = Console.ReadLine();
         Console.WriteLine("Enter Port:\n> ");
-        stats[1] = Console.ReadLine();
+        //TODO REMOVE
+        stats[1] = "25565";
+        //stats[1] = Console.ReadLine();
         return stats;
     }
 
