@@ -22,6 +22,7 @@ public class Server : MonoBehaviour
         // Sets ListenerThread as background thread.
         tcpListenerThread.IsBackground = true;
         tcpListenerThread.Start();
+        UnityEngine.Debug.Log("Initializing Server");
     }
 
     // Delegate Method

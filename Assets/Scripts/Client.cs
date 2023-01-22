@@ -24,6 +24,7 @@ public class Client : MonoBehaviour
         // Sets ListenerThread as background thread.
         tcpClientThread.IsBackground = true;
         tcpClientThread.Start();
+        UnityEngine.Debug.Log("Initializing Client");
     }
 
     // Delegate Method
@@ -56,6 +57,6 @@ public class Client : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
