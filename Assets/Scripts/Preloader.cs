@@ -49,7 +49,7 @@ public class Preloader : MonoBehaviour
                         server = GetComponent<Server>();
                         server.initServer(stats[0], Convert.ToInt32(stats[1]));
                     } catch (Exception e) {
-                        Console.WriteLine(e.ToString());
+                        UnityEngine.Debug.Log(e.ToString());
                     }
                     
                     break;
@@ -59,14 +59,14 @@ public class Preloader : MonoBehaviour
                         server = GetComponent<Server>();
                         server.initServer(stats[0], Convert.ToInt32(stats[1]));
                     } catch (Exception e) {
-                        Console.WriteLine(e.ToString());
+                        UnityEngine.Debug.Log(e.ToString());
                     }
                     try {
                         // Load client with IP and port
                         client = GetComponent<Client>();
                         client.initClient(stats[0], Convert.ToInt32(stats[1]));
                     } catch (Exception e) {
-                        Console.WriteLine(e.ToString());
+                        UnityEngine.Debug.Log(e.ToString());
                     }
                     
                     break;
@@ -76,7 +76,7 @@ public class Preloader : MonoBehaviour
                         client = GetComponent<Client>();
                         client.initClient(stats[0], Convert.ToInt32(stats[1]));
                     } catch (Exception e) {
-                        Console.WriteLine(e.ToString());
+                        UnityEngine.Debug.Log(e.ToString());
                     }
                     break;
             }

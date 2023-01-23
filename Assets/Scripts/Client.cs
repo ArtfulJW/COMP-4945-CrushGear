@@ -20,6 +20,8 @@ public class Client : MonoBehaviour
     {
         // Create Server Endpoint
         endPoint = new IPEndPoint(IPAddress.Parse(IP), port);
+        clientConnection = new TcpClient(endPoint);
+        clientConnection.Connect(endPoint);
         // Listens for Client Connections right away.
         Thread tcpClientThread = new Thread(new ThreadStart(ConnectionListener));
         // Sets ListenerThread as background thread.
@@ -31,7 +33,6 @@ public class Client : MonoBehaviour
     // Delegate Method
     void ConnectionListener()
     {
-        clientConnection = new TcpClient(endPoint);
         byte[] buffer = new byte[1024];
 
         // TODO: Add exception handling
@@ -49,13 +50,10 @@ public class Client : MonoBehaviour
         }
     }
 
-    public void Send(byte[] payload)
+    public void Send(NetworkStream stream, byte[] payload)
     {
-        // Obtain underlying NetworkStream.
-        using NetworkStream stream = clientConnection.GetStream();
-
         // Use Write() to send some payload to peer.
-        stream.Write(payload);
+        stream.Write(payload, 0, payload.Length);
     }
 
     // Start is called before the first frame update
@@ -81,17 +79,16 @@ public class Client : MonoBehaviour
         
         foreach(string parameters in playerInfo)
         {
-            //UnityEngine.Debug.Log(parameters);
-        }
-        for (int i = 0; i< playerInfo.Length; i++)
-        {
-            UnityEngine.Debug.Log(playerInfo[i]);
+            UnityEngine.Debug.Log(parameters);
         }
         //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 0, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
         //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
         //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
 
-        // Send Payload
-        Send(payload);
+        using NetworkStream stream = clientConnection.GetStream();
+        
+        stream.Write(payload, 0, payload.Length);
+        
+        
     }
 }

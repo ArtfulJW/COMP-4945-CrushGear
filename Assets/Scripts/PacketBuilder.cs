@@ -9,9 +9,10 @@ public class PacketBuilder
 {
     public static class Constants
     {
-        public static int HEADERSIZE = 64;
+        // Tentative Formats for each Packet.
         public static string PLAYERFORMAT = "{0},{1},{2},{3}";
         public static string PLAYERDISCONNECTFORMAT = "{0},{1}";
+        public static int HEADERSIZE = 64;
         public const string DELIM = ",";
     }
 
@@ -31,42 +32,51 @@ public class PacketBuilder
 
     }
 
-    public void addPlayerDisconnectBodyPart(MemoryStream memoryStream, int id)
+    public void addPlayerDisconnectBodyPart(MemoryStream memoryStream)
     {
+        // Get GameState Singleton
+        GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent<GameManager>();
+
         // Init StringBuilder
         StringBuilder stringBuilder = new StringBuilder();
 
         // Build payload
-        stringBuilder.AppendFormat(Constants.PLAYERDISCONNECTFORMAT, ContentTypeEnum.PlayerDisconnect, id.ToString());
+        stringBuilder.AppendFormat(Constants.PLAYERDISCONNECTFORMAT, ContentTypeEnum.PlayerDisconnect, gameManager.localPlayer.id.ToString());
 
         // Pack payload and write to memoryStream
         memoryStream.Write(Encoding.ASCII.GetBytes(packString(stringBuilder.ToString())), 0, Constants.HEADERSIZE);
     }
 
-    public void addPlayerBodyPart(MemoryStream memoryStream, int id, float xcoord, float ycoord)
+    public void addPlayerBodyPart(MemoryStream memoryStream)
     {
+        // Get GameState Singleton
+        GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent<GameManager>();
+
         // Init StringBuilder
         StringBuilder stringBuilder = new StringBuilder();
 
         // Build payload
-        stringBuilder.AppendFormat(Constants.PLAYERFORMAT, ContentTypeEnum.Player.ToString(), id.ToString(), xcoord.ToString(), ycoord.ToString());
+        stringBuilder.AppendFormat(Constants.PLAYERFORMAT, ContentTypeEnum.Player.ToString(), gameManager.localPlayer.id.ToString(), gameManager.localPlayer.xcoord.ToString(), gameManager.localPlayer.ycoord.ToString());
 
         // Pack payload and write to memoryStream
         memoryStream.Write(Encoding.ASCII.GetBytes(packString(stringBuilder.ToString())), 0, Constants.HEADERSIZE);
         //UnityEngine.Debug.Log(Encoding.ASCII.GetString(memoryStream.ToArray()));
     }
 
-    public void addPlayerConnectBodyPart(MemoryStream memoryStream, List<Player> playerList)
+    public void addPlayerConnectBodyPart(MemoryStream memoryStream)
     {
+        // Get GameState Singleton
+        GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent<GameManager>();
+
         // Init StringBuilder
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.Append(ContentTypeEnum.PlayerConnect);
 
         // Build payload
-        foreach(Player player in playerList)
+        foreach(Player player in gameManager.playerList)
         {
-            stringBuilder.Append(Constants.DELIM).AppendFormat(Constants.PLAYERFORMAT, ContentTypeEnum.Player, player.id.ToString(), player.xcoord.ToString(), player.ycoord.ToString());
+            stringBuilder.Append(Constants.DELIM).AppendFormat(Constants.PLAYERFORMAT, ContentTypeEnum.Player.ToString(), player.id.ToString(), player.xcoord.ToString(), player.ycoord.ToString());
         }
 
         memoryStream.Write(Encoding.ASCII.GetBytes(packString(stringBuilder.ToString())), 0, Constants.HEADERSIZE);
@@ -86,27 +96,24 @@ public class PacketBuilder
 
     public byte[] buildPacket(params ContentTypeEnum[] container)
     {
-        // Get GameState Singleton
-        GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent<GameManager>();
 
         // Init MemoryStream
         using MemoryStream memoryStream = new MemoryStream();
-        UnicodeEncoding unicodeEncoding = new UnicodeEncoding();
 
         // Write Header information from 0th index to Constants.HEADERSIZE index
         foreach (ContentTypeEnum contentType in container)
         {
+            // Pass in MemoryStream to append BodyPart. Convert to byte array for output.
             switch (contentType)
             {
                 case ContentTypeEnum.Player:
-                    addPlayerBodyPart(memoryStream, gameManager.localPlayer.id, gameManager.localPlayer.xcoord, gameManager.localPlayer.ycoord);
+                    addPlayerBodyPart(memoryStream);
                     break;
                 case ContentTypeEnum.PlayerConnect:
-                    // Build this BodyPart
-                    addPlayerConnectBodyPart(memoryStream, gameManager.playerList);
+                    addPlayerConnectBodyPart(memoryStream);
                     break;
                 case ContentTypeEnum.PlayerDisconnect:
-                    addPlayerDisconnectBodyPart(memoryStream, gameManager.localPlayer.id) ;
+                    addPlayerDisconnectBodyPart(memoryStream) ;
                     break;
                 default:
                     break;
