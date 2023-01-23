@@ -10,6 +10,9 @@ public class PacketBuilder
     public static class Constants
     {
         public static int HEADERSIZE = 64;
+        public static string PLAYERFORMAT = "{0},{1},{2},{3}";
+        public static string PLAYERDISCONNECTFORMAT = "{0},{1}";
+        public const string DELIM = ",";
     }
 
 
@@ -28,10 +31,28 @@ public class PacketBuilder
 
     }
 
-    public void addPlayerInfo(MemoryStream memoryStream, int id, float xcoord, float ycoord)
+    public void addPlayerDisconnectBodyPart(MemoryStream memoryStream, int id)
     {
-        string playerInfo = ContentTypeEnum.Player.ToString() + "," + "id=" + id.ToString() + "," + "xcoord=" + xcoord.ToString() + "," + "ycoord=" + ycoord.ToString();
-        memoryStream.Write(Encoding.ASCII.GetBytes(packString(playerInfo)), 0, Constants.HEADERSIZE);
+        // Init StringBuilder
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // Build payload
+        stringBuilder.AppendFormat(Constants.PLAYERDISCONNECTFORMAT, ContentTypeEnum.PlayerDisconnect, id.ToString());
+
+        // Pack payload and write to memoryStream
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(stringBuilder.ToString())), 0, Constants.HEADERSIZE);
+    }
+
+    public void addPlayerBodyPart(MemoryStream memoryStream, int id, float xcoord, float ycoord)
+    {
+        // Init StringBuilder
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // Build payload
+        stringBuilder.AppendFormat(Constants.PLAYERFORMAT, ContentTypeEnum.Player.ToString(), id.ToString(), xcoord.ToString(), ycoord.ToString());
+
+        // Pack payload and write to memoryStream
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(stringBuilder.ToString())), 0, Constants.HEADERSIZE);
         //UnityEngine.Debug.Log(Encoding.ASCII.GetString(memoryStream.ToArray()));
     }
 
@@ -64,13 +85,13 @@ public class PacketBuilder
             switch (contentType)
             {
                 case ContentTypeEnum.Player:
-                    addPlayerInfo(memoryStream, p.id, p.xcoord, p.ycoord);
+                    addPlayerBodyPart(memoryStream, p.id, p.xcoord, p.ycoord);
                     break;
                 case ContentTypeEnum.PlayerConnect:
                     // Build this BodyPart
                     break;
                 case ContentTypeEnum.PlayerDisconnect:
-                    // Build this BodyPart
+                    addPlayerDisconnectBodyPart(memoryStream, p.id);
                     break;
                 default:
                     break;

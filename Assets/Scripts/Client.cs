@@ -71,9 +71,9 @@ public class Client : MonoBehaviour
 
         // Build Packet
         byte[] payload;
-        payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.Player);
+        payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.PlayerDisconnect);
         
-        UnityEngine.Debug.Log("Recieved Payload: "+Encoding.ASCII.GetString(payload));
+        UnityEngine.Debug.Log("Built Payload: " + Encoding.ASCII.GetString(payload));
 
         // Parsing from 0th index to the length of the header.
         string[] playerInfo = Encoding.ASCII.GetString(payload).Trim('*').Split(',');
