@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Xml.XPath;
 using UnityEngine;
 
 public class PacketBuilder
 {
     public static class Constants
     {
-        public static int HEADERSIZE = 16;
+        public static int HEADERSIZE = 64;
     }
 
 
@@ -19,9 +20,19 @@ public class PacketBuilder
         PlayerDisconnect
     }
 
-    public void addPacketHeader(ContentTypeEnum contentTypeEnum)
-    { 
-        
+    public void addPacketHeader(MemoryStream memoryStream, ContentTypeEnum contentTypeEnum)
+    {
+
+        // Write Header information from 0th index to Constants.HEADERSIZE index
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(contentTypeEnum.ToString())), 0, Constants.HEADERSIZE);
+
+    }
+
+    public void addPlayerInfo(MemoryStream memoryStream, int id, float xcoord, float ycoord)
+    {
+        string playerInfo = ContentTypeEnum.Player.ToString() + "," + "id=" + id.ToString() + "," + "xcoord=" + xcoord.ToString() + "," + "ycoord=" + ycoord.ToString();
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(playerInfo)), 0, Constants.HEADERSIZE);
+        //UnityEngine.Debug.Log(Encoding.ASCII.GetString(memoryStream.ToArray()));
     }
 
     public string packString(string str)
@@ -35,23 +46,36 @@ public class PacketBuilder
 
     }
 
-    public byte[] buildPacket(ContentTypeEnum contentTypeEnum)
+    public byte[] buildPacket(params ContentTypeEnum[] container)
     {
+        // Get GameState Singleton
+        GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent("GameManager");
+        
+        // Test Player - Later on pull player details directly from GameManager Singleton
+        Player p = new Player();
+
         // Init MemoryStream
         using MemoryStream memoryStream = new MemoryStream();
-        // Set Payload buffer Size
-        //memoryStream.SetLength(1000);
-
         UnicodeEncoding unicodeEncoding = new UnicodeEncoding();
 
         // Write Header information from 0th index to Constants.HEADERSIZE index
-        memoryStream.Write(Encoding.ASCII.GetBytes(packString(contentTypeEnum.ToString())), 0, Constants.HEADERSIZE);
-        memoryStream.Write(Encoding.ASCII.GetBytes(packString(ContentTypeEnum.PlayerConnect.ToString())), 0, Constants.HEADERSIZE);
-        memoryStream.Write(Encoding.ASCII.GetBytes(packString(ContentTypeEnum.PlayerDisconnect.ToString())), 0, Constants.HEADERSIZE);
-
-        //string plyr = prepString(ContentTypeEnum.PlayerConnect.ToString());
-        //UnityEngine.Debug.Log(plyr);    
-
+        foreach (ContentTypeEnum contentType in container)
+        {
+            switch (contentType)
+            {
+                case ContentTypeEnum.Player:
+                    addPlayerInfo(memoryStream, p.id, p.xcoord, p.ycoord);
+                    break;
+                case ContentTypeEnum.PlayerConnect:
+                    // Build this BodyPart
+                    break;
+                case ContentTypeEnum.PlayerDisconnect:
+                    // Build this BodyPart
+                    break;
+                default:
+                    break;
+            }
+        }
 
         //UnityEngine.Debug.Log("HELL: " + Encoding.ASCII.GetString(memoryStream.ToArray()));
         return memoryStream.ToArray();

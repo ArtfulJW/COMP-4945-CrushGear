@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 public class GameManager : MonoBehaviour
 {
-    Player localPlayer;
+    public Player localPlayer;
     List<Player> playerList;
 
     private static GameManager gameManagerInstance;

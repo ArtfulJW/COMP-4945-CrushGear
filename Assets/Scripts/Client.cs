@@ -72,11 +72,18 @@ public class Client : MonoBehaviour
         // Build Packet
         byte[] payload;
         payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.Player);
+        
+        UnityEngine.Debug.Log("Recieved Payload: "+Encoding.ASCII.GetString(payload));
 
         // Parsing from 0th index to the length of the header.
-        UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 0, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
-        UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
-        UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
+        string[] playerInfo = Encoding.ASCII.GetString(payload).Trim('*').Split(',');
+        foreach(string parameters in playerInfo)
+        {
+            UnityEngine.Debug.Log(parameters);
+        }
+        //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 0, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
+        //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
+        //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
 
         // Send Payload
         Send(payload);
