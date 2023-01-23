@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using UnityEngine;
@@ -71,15 +72,20 @@ public class Client : MonoBehaviour
 
         // Build Packet
         byte[] payload;
-        payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.PlayerDisconnect);
+        payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.PlayerConnect);
         
         UnityEngine.Debug.Log("Built Payload: " + Encoding.ASCII.GetString(payload));
 
         // Parsing from 0th index to the length of the header.
         string[] playerInfo = Encoding.ASCII.GetString(payload).Trim('*').Split(',');
+        
         foreach(string parameters in playerInfo)
         {
-            UnityEngine.Debug.Log(parameters);
+            //UnityEngine.Debug.Log(parameters);
+        }
+        for (int i = 0; i< playerInfo.Length; i++)
+        {
+            UnityEngine.Debug.Log(playerInfo[i]);
         }
         //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 0, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
         //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));

@@ -56,6 +56,23 @@ public class PacketBuilder
         //UnityEngine.Debug.Log(Encoding.ASCII.GetString(memoryStream.ToArray()));
     }
 
+    public void addPlayerConnectBodyPart(MemoryStream memoryStream, List<Player> playerList)
+    {
+        // Init StringBuilder
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.Append(ContentTypeEnum.PlayerConnect);
+
+        // Build payload
+        foreach(Player player in playerList)
+        {
+            stringBuilder.Append(Constants.DELIM).AppendFormat(Constants.PLAYERFORMAT, ContentTypeEnum.Player, player.id.ToString(), player.xcoord.ToString(), player.ycoord.ToString());
+        }
+
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(stringBuilder.ToString())), 0, Constants.HEADERSIZE);
+
+    }
+
     public string packString(string str)
     {
         while (str.Length < Constants.HEADERSIZE)
@@ -71,9 +88,17 @@ public class PacketBuilder
     {
         // Get GameState Singleton
         GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent("GameManager");
-        
+
         // Test Player - Later on pull player details directly from GameManager Singleton
+        List<Player> playerList = new List<Player>();
         Player p = new Player();
+        Player p2 = new Player();
+        playerList.Add(p);
+        playerList.Add(p2);
+        p2.id = 9999;
+        p2.xcoord = 144.9F;
+        p2.ycoord = 333.2F;
+
 
         // Init MemoryStream
         using MemoryStream memoryStream = new MemoryStream();
@@ -89,6 +114,7 @@ public class PacketBuilder
                     break;
                 case ContentTypeEnum.PlayerConnect:
                     // Build this BodyPart
+                    addPlayerConnectBodyPart(memoryStream, playerList);
                     break;
                 case ContentTypeEnum.PlayerDisconnect:
                     addPlayerDisconnectBodyPart(memoryStream, p.id);
