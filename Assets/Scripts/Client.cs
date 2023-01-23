@@ -48,6 +48,15 @@ public class Client : MonoBehaviour
         }
     }
 
+    public void Send(byte[] payload)
+    {
+        // Obtain underlying NetworkStream.
+        using NetworkStream stream = clientConnection.GetStream();
+
+        // Use Write() to send some payload to peer.
+        //stream.Write(packet.BuildPacket(....));
+    }
+
     // Start is called before the first frame update
     //void Start()
     //{
@@ -57,6 +66,14 @@ public class Client : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Init PacketBuilder
+        PacketBuilder packetBuilder = new PacketBuilder();
 
+        // Build Packet
+        byte[] payload = new byte[PacketBuilder.Constants.HEADERSIZE];
+        packetBuilder.buildPacket(payload, PacketBuilder.ContentTypeEnum.Player);
+
+        // Send Payload
+        Send(payload);
     }
 }
