@@ -70,10 +70,13 @@ public class Client : MonoBehaviour
         PacketBuilder packetBuilder = new PacketBuilder();
 
         // Build Packet
-        byte[] payload = new byte[PacketBuilder.Constants.HEADERSIZE];
+        byte[] payload;
         payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.Player);
 
-        //UnityEngine.Debug.Log("Payload: " + Encoding.ASCII.GetString(payload));
+        // Parsing from 0th index to the length of the header.
+        UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 0, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
+        UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
+        UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
 
         // Send Payload
         Send(payload);

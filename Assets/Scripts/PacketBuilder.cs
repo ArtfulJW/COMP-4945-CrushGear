@@ -8,7 +8,7 @@ public class PacketBuilder
 {
     public static class Constants
     {
-        public static int HEADERSIZE = 8;
+        public static int HEADERSIZE = 16;
     }
 
 
@@ -24,13 +24,35 @@ public class PacketBuilder
         
     }
 
+    public string packString(string str)
+    {
+        while (str.Length < Constants.HEADERSIZE)
+        {
+            str += '*';
+        }
+        //UnityEngine.Debug.Log(str);
+        return str;
+
+    }
+
     public byte[] buildPacket(ContentTypeEnum contentTypeEnum)
     {
         // Init MemoryStream
-        using MemoryStream memoryStream = new MemoryStream(Constants.HEADERSIZE);
+        using MemoryStream memoryStream = new MemoryStream();
+        // Set Payload buffer Size
+        //memoryStream.SetLength(1000);
 
-        memoryStream.Write(Encoding.ASCII.GetBytes(contentTypeEnum.ToString()),0, contentTypeEnum.ToString().Length);
-        
+        UnicodeEncoding unicodeEncoding = new UnicodeEncoding();
+
+        // Write Header information from 0th index to Constants.HEADERSIZE index
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(contentTypeEnum.ToString())), 0, Constants.HEADERSIZE);
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(ContentTypeEnum.PlayerConnect.ToString())), 0, Constants.HEADERSIZE);
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(ContentTypeEnum.PlayerDisconnect.ToString())), 0, Constants.HEADERSIZE);
+
+        //string plyr = prepString(ContentTypeEnum.PlayerConnect.ToString());
+        //UnityEngine.Debug.Log(plyr);    
+
+
         //UnityEngine.Debug.Log("HELL: " + Encoding.ASCII.GetString(memoryStream.ToArray()));
         return memoryStream.ToArray();
     }
