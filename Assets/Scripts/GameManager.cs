@@ -5,8 +5,8 @@ using TMPro;
 using UnityEngine;
 public class GameManager : MonoBehaviour
 {
-    public Player localPlayer;
-    List<Player> playerList;
+    public Player localPlayer = new Player();
+    public List<Player> playerList = new List<Player>();
 
     private static GameManager gameManagerInstance;
     public static GameManager getInstance { get { return gameManagerInstance; } }
@@ -24,6 +24,14 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        // Testing
+        playerList.Add(new Player());
+        Player p = new Player();
+        p.id = 222;
+        p.xcoord = 999F;
+        p.ycoord = 777F;
+        playerList.Add(p);
+
         if (gameManagerInstance != null && gameManagerInstance != this)
         {
             Destroy(this);

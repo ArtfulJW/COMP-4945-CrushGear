@@ -87,18 +87,7 @@ public class PacketBuilder
     public byte[] buildPacket(params ContentTypeEnum[] container)
     {
         // Get GameState Singleton
-        GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent("GameManager");
-
-        // Test Player - Later on pull player details directly from GameManager Singleton
-        List<Player> playerList = new List<Player>();
-        Player p = new Player();
-        Player p2 = new Player();
-        playerList.Add(p);
-        playerList.Add(p2);
-        p2.id = 9999;
-        p2.xcoord = 144.9F;
-        p2.ycoord = 333.2F;
-
+        GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent<GameManager>();
 
         // Init MemoryStream
         using MemoryStream memoryStream = new MemoryStream();
@@ -110,14 +99,14 @@ public class PacketBuilder
             switch (contentType)
             {
                 case ContentTypeEnum.Player:
-                    addPlayerBodyPart(memoryStream, p.id, p.xcoord, p.ycoord);
+                    addPlayerBodyPart(memoryStream, gameManager.localPlayer.id, gameManager.localPlayer.xcoord, gameManager.localPlayer.ycoord);
                     break;
                 case ContentTypeEnum.PlayerConnect:
                     // Build this BodyPart
-                    addPlayerConnectBodyPart(memoryStream, playerList);
+                    addPlayerConnectBodyPart(memoryStream, gameManager.playerList);
                     break;
                 case ContentTypeEnum.PlayerDisconnect:
-                    addPlayerDisconnectBodyPart(memoryStream, p.id);
+                    addPlayerDisconnectBodyPart(memoryStream, gameManager.localPlayer.id) ;
                     break;
                 default:
                     break;
