@@ -24,13 +24,14 @@ public class PacketBuilder
         
     }
 
-    public byte[] buildPacket(byte[] payload, ContentTypeEnum contentTypeEnum)
+    public byte[] buildPacket(ContentTypeEnum contentTypeEnum)
     {
         // Init MemoryStream
         using MemoryStream memoryStream = new MemoryStream(Constants.HEADERSIZE);
 
         memoryStream.Write(Encoding.ASCII.GetBytes(contentTypeEnum.ToString()),0, contentTypeEnum.ToString().Length);
-
+        
+        //UnityEngine.Debug.Log("HELL: " + Encoding.ASCII.GetString(memoryStream.ToArray()));
         return memoryStream.ToArray();
     }
 

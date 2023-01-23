@@ -54,7 +54,7 @@ public class Client : MonoBehaviour
         using NetworkStream stream = clientConnection.GetStream();
 
         // Use Write() to send some payload to peer.
-        //stream.Write(packet.BuildPacket(....));
+        stream.Write(payload);
     }
 
     // Start is called before the first frame update
@@ -71,7 +71,9 @@ public class Client : MonoBehaviour
 
         // Build Packet
         byte[] payload = new byte[PacketBuilder.Constants.HEADERSIZE];
-        packetBuilder.buildPacket(payload, PacketBuilder.ContentTypeEnum.Player);
+        payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.Player);
+
+        //UnityEngine.Debug.Log("Payload: " + Encoding.ASCII.GetString(payload));
 
         // Send Payload
         Send(payload);
