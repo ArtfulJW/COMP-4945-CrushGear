@@ -51,7 +51,7 @@ public class Preloader : MonoBehaviour
                         server.enabled = true;
                         if (server.enabled) Debug.Log("Server enabled");
                     } catch (Exception e) {
-                        UnityEngine.Debug.Log(e.ToString());
+                        Debug.Log(e.ToString());
                     }
                     
                     break;
@@ -63,7 +63,7 @@ public class Preloader : MonoBehaviour
                         server.enabled = true;
                         if (server.enabled) Debug.Log("Server enabled");
                     } catch (Exception e) {
-                        UnityEngine.Debug.Log(e.ToString());
+                        Debug.Log(e.ToString());
                     }
                     try {
                         // Load client with IP and port
@@ -72,7 +72,7 @@ public class Preloader : MonoBehaviour
                         client.enabled = true;
                         if (client.enabled) Debug.Log("Client enabled");
                     } catch (Exception e) {
-                        UnityEngine.Debug.Log(e.ToString());
+                        Debug.Log(e.ToString());
                     }
                     
                     break;
@@ -85,7 +85,7 @@ public class Preloader : MonoBehaviour
                         if (client.enabled) Debug.Log("Client enabled");
                     }
                     catch (Exception e) {
-                        UnityEngine.Debug.Log(e.ToString());
+                        Debug.Log(e.ToString());
                     }
                     break;
                 default:

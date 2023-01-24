@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -15,6 +14,8 @@ public class Server : MonoBehaviour
 
     public void initServer(string IP, int port)
     {
+        // Instantiate clientList
+        clientList = new List<TcpClient>();
         // Create Server Endpoint
         endPoint = new IPEndPoint(IPAddress.Parse(IP), port);
         // Listens for Client Connections right away.
@@ -22,7 +23,7 @@ public class Server : MonoBehaviour
         // Sets ListenerThread as background thread.
         tcpListenerThread.IsBackground = true;
         tcpListenerThread.Start();
-        UnityEngine.Debug.Log("Initializing Server");
+        Debug.Log("Initializing Server");
     }
 
     // Delegate Method
@@ -59,7 +60,7 @@ public class Server : MonoBehaviour
                 while ((recv = stream.Read(buffer, 0, buffer.Length)) != 0)
                 {
                     string recievedMsg = Encoding.ASCII.GetString(buffer);
-                    System.Diagnostics.Debug.WriteLine("Debug: Recieved Message.\n" + recievedMsg);
+                    Debug.Log("Debug: Recieved Message.\n" + recievedMsg);
                 }
             }
         }

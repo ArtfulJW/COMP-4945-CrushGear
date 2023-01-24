@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using UnityEngine;
@@ -27,7 +25,7 @@ public class Client : MonoBehaviour
         // Sets ListenerThread as background thread.
         tcpClientThread.IsBackground = true;
         tcpClientThread.Start();
-        UnityEngine.Debug.Log("Initializing Client");
+        Debug.Log("Initializing Client");
     }
 
     // Delegate Method
@@ -44,7 +42,7 @@ public class Client : MonoBehaviour
                 while ((recv = stream.Read(buffer, 0, buffer.Length)) != 0)
                 {
                     string recievedMessage = Encoding.ASCII.GetString(buffer);
-                    System.Diagnostics.Debug.WriteLine("Recieved Message:\n" + recievedMessage);
+                    Debug.Log("Recieved Message:\n" + recievedMessage);
                 }
             }
         }
