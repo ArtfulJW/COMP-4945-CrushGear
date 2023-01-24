@@ -20,7 +20,7 @@ public class Client : MonoBehaviour
     {
         // Create Server Endpoint
         endPoint = new IPEndPoint(IPAddress.Parse(IP), port);
-        clientConnection = new TcpClient(endPoint);
+        clientConnection = new TcpClient();
         clientConnection.Connect(endPoint);
         // Listens for Client Connections right away.
         Thread tcpClientThread = new Thread(new ThreadStart(ConnectionListener));
@@ -72,20 +72,20 @@ public class Client : MonoBehaviour
         byte[] payload;
         payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.PlayerConnect);
         
-        UnityEngine.Debug.Log("Built Payload: " + Encoding.ASCII.GetString(payload));
+        //UnityEngine.Debug.Log("Built Payload: " + Encoding.ASCII.GetString(payload));
 
         // Parsing from 0th index to the length of the header.
         string[] playerInfo = Encoding.ASCII.GetString(payload).Trim('*').Split(',');
         
         foreach(string parameters in playerInfo)
         {
-            UnityEngine.Debug.Log(parameters);
+            //UnityEngine.Debug.Log(parameters);
         }
         //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 0, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
         //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
         //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
 
-        using NetworkStream stream = clientConnection.GetStream();
+        NetworkStream stream = clientConnection.GetStream();
         
         stream.Write(payload, 0, payload.Length);
         

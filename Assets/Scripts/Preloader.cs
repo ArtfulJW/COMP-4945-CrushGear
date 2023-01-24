@@ -48,6 +48,8 @@ public class Preloader : MonoBehaviour
                         // Load Server with IP and port
                         server = GetComponent<Server>();
                         server.initServer(stats[0], Convert.ToInt32(stats[1]));
+                        server.enabled = true;
+                        if (server.enabled) Debug.Log("Server enabled");
                     } catch (Exception e) {
                         UnityEngine.Debug.Log(e.ToString());
                     }
@@ -58,6 +60,8 @@ public class Preloader : MonoBehaviour
                         // Load Server with IP and port
                         server = GetComponent<Server>();
                         server.initServer(stats[0], Convert.ToInt32(stats[1]));
+                        server.enabled = true;
+                        if (server.enabled) Debug.Log("Server enabled");
                     } catch (Exception e) {
                         UnityEngine.Debug.Log(e.ToString());
                     }
@@ -65,19 +69,27 @@ public class Preloader : MonoBehaviour
                         // Load client with IP and port
                         client = GetComponent<Client>();
                         client.initClient(stats[0], Convert.ToInt32(stats[1]));
+                        client.enabled = true;
+                        if (client.enabled) Debug.Log("Client enabled");
                     } catch (Exception e) {
                         UnityEngine.Debug.Log(e.ToString());
                     }
                     
                     break;
-                default:
+                case "-client":
                     try {
                         // Load client with IP and port
                         client = GetComponent<Client>();
                         client.initClient(stats[0], Convert.ToInt32(stats[1]));
-                    } catch (Exception e) {
+                        client.enabled = true;
+                        if (client.enabled) Debug.Log("Client enabled");
+                    }
+                    catch (Exception e) {
                         UnityEngine.Debug.Log(e.ToString());
                     }
+                    break;
+                default:
+                    Debug.Log(str + ": Invalid argument");
                     break;
             }
         }
