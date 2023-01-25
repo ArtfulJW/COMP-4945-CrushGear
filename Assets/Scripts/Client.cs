@@ -68,20 +68,22 @@ public class Client : MonoBehaviour
 
         // Build Packet
         byte[] payload;
-        payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.PlayerConnect);
-        
+        payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.Player);
+
         //UnityEngine.Debug.Log("Built Payload: " + Encoding.ASCII.GetString(payload));
 
         // Parsing from 0th index to the length of the header.
-        string[] playerInfo = Encoding.ASCII.GetString(payload).Trim('*').Split(',');
-        
-        foreach(string parameters in playerInfo)
-        {
-            //UnityEngine.Debug.Log(parameters);
-        }
-        //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 0, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
-        //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
-        //UnityEngine.Debug.Log("Payload: " + Encoding.UTF8.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
+        //string[] playerInfo = Encoding.ASCII.GetString(payload).Trim('*').Split(',');
+
+        //foreach(string parameters in playerInfo)
+        //{
+        //UnityEngine.Debug.Log(payload);
+        //}
+        UnityEngine.Debug.Log("Header: " + BitConverter.ToString(payload,0, PacketBuilder.Constants.PACKETHEADERLENGTH));
+        string payloadString = Encoding.ASCII.GetString(payload, PacketBuilder.Constants.PACKETHEADERLENGTH, payload.Length - PacketBuilder.Constants.PACKETHEADERLENGTH);
+        Debug.Log("Payload: " + payloadString);
+        //UnityEngine.Debug.Log("Payload: " + Encoding.ASCII.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
+        //UnityEngine.Debug.Log("Payload: " + Encoding.ASCII.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
 
         NetworkStream stream = clientConnection.GetStream();
         
