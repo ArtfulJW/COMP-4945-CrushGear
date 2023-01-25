@@ -48,8 +48,9 @@ public class Client : MonoBehaviour
         }
     }
 
-    public void Send(NetworkStream stream, byte[] payload)
+    public void Send(byte[] payload)
     {
+        NetworkStream stream = clientConnection.GetStream();
         // Use Write() to send some payload to peer.
         stream.Write(payload, 0, payload.Length);
     }
@@ -85,9 +86,8 @@ public class Client : MonoBehaviour
         //UnityEngine.Debug.Log("Payload: " + Encoding.ASCII.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
         //UnityEngine.Debug.Log("Payload: " + Encoding.ASCII.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
 
-        NetworkStream stream = clientConnection.GetStream();
         
-        stream.Write(payload, 0, payload.Length);
+        Send(payload);
         
         
     }

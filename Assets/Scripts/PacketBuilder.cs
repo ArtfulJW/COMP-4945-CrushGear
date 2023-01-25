@@ -9,6 +9,15 @@ using UnityEngine;
 
 public class PacketBuilder
 {
+    public struct Packet {
+        public ContentTypeEnum contentType;
+        public byte[] data;
+
+        public Packet(ContentTypeEnum contentType, byte[] data) {
+            this.contentType = contentType;
+            this.data = data;  
+        }
+    }
     public static class Constants
     {
         // Tentative Formats for each Packet.
@@ -18,7 +27,7 @@ public class PacketBuilder
         // Of order ContentTypeEnum, Packet Length 
         public static string PACKETHEADER = "{0}{1}";
         // Size of ContentTypeEnum, Packet Length data types
-        public static byte PACKETHEADERLENGTH = 4 + 1;
+        public static byte PACKETHEADERLENGTH = 1 + 4;
         //public static int HEADERSIZE = 64;
         public const string DELIM = ",";
     }
