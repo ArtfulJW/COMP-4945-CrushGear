@@ -79,9 +79,9 @@ public class Client : MonoBehaviour
         //{
         //UnityEngine.Debug.Log(payload);
         //}
-        UnityEngine.Debug.Log("Header: " + BitConverter.ToString(payload,0, PacketBuilder.Constants.PACKETHEADERLENGTH));
-        string payloadString = Encoding.ASCII.GetString(payload, PacketBuilder.Constants.PACKETHEADERLENGTH, payload.Length - PacketBuilder.Constants.PACKETHEADERLENGTH);
-        Debug.Log("Payload: " + payloadString);
+        //UnityEngine.Debug.Log("Header: " + BitConverter.ToString(payload,0, PacketBuilder.Constants.PACKETHEADERLENGTH));
+        //string payloadString = Encoding.ASCII.GetString(payload, PacketBuilder.Constants.PACKETHEADERLENGTH, payload.Length - PacketBuilder.Constants.PACKETHEADERLENGTH);
+        //Debug.Log("Payload: " + payloadString);
         //UnityEngine.Debug.Log("Payload: " + Encoding.ASCII.GetString(payload, PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
         //UnityEngine.Debug.Log("Payload: " + Encoding.ASCII.GetString(payload, 2*PacketBuilder.Constants.HEADERSIZE, PacketBuilder.Constants.HEADERSIZE).Trim('*'));
 

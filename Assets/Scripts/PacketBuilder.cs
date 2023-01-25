@@ -15,9 +15,9 @@ public class PacketBuilder
         public static string PLAYERFORMAT = "{0} {1} {2}";
         public static string PLAYERCONNECTFORMAT = "{0}{1}";
         public static string PLAYERDISCONNECTFORMAT = "{0}{1}";
-        // Of order Packet Length, ContentTypeEnum
+        // Of order ContentTypeEnum, Packet Length 
         public static string PACKETHEADER = "{0}{1}";
-        // Size of Packet Length, ContentTypeEnum data types
+        // Size of ContentTypeEnum, Packet Length data types
         public static byte PACKETHEADERLENGTH = 4 + 1;
         //public static int HEADERSIZE = 64;
         public const string DELIM = ",";
@@ -34,9 +34,10 @@ public class PacketBuilder
     private void buildPacketHeader(MemoryStream memoryStream, ContentTypeEnum contentTypeEnum, int payloadLength)
     {
         // Write Header information from 0th index to Constants.HEADERSIZE index
-        memoryStream.Write(BitConverter.GetBytes(payloadLength));
         byte type = (byte)contentTypeEnum;
         memoryStream.WriteByte(type);
+        memoryStream.Write(BitConverter.GetBytes(payloadLength));
+       
     }
 
     /// <summary>

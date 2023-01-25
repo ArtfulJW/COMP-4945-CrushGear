@@ -51,16 +51,20 @@ public class Server : MonoBehaviour
     void processClient(object data)
     {
         int recv = 0;
-        byte[] buffer = new byte[1024];
+        byte[] headerBuffer = new byte[PacketBuilder.Constants.PACKETHEADERLENGTH];
         if (data is TcpClient)
         {
             using (NetworkStream stream = ((TcpClient)data).GetStream())
             {
                 // Read until no more to read.
-                while ((recv = stream.Read(buffer, 0, buffer.Length)) != 0)
+                while ((recv = stream.Read(headerBuffer, 0, headerBuffer.Length)) != 0)
                 {
-                    string recievedMsg = Encoding.ASCII.GetString(buffer);
-                    Debug.Log("Debug: Recieved Message.\n" + recievedMsg);
+                    PacketBuilder.ContentTypeEnum type = (PacketBuilder.ContentTypeEnum) headerBuffer[0];
+                    int contentLength = BitConverter.ToInt32(headerBuffer, 1);
+                    Debug.LogFormat("Debug: Type {0}, ContentLength {1}\n", type, contentLength);
+                    byte[] buffer = new byte[contentLength];
+                    stream.Read(buffer, 0, contentLength);
+                    Debug.LogFormat("Debug: {0}\n", Encoding.ASCII.GetString(buffer));
                 }
             }
         }
