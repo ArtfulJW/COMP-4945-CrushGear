@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Awake()
+    void Awake()
     {
         // Testing
         playerList.Add(new Player());
@@ -41,4 +41,9 @@ public class GameManager : MonoBehaviour
             gameManagerInstance = this;
         }
     }
+
+    public override string ToString() {
+        return "GAMESTATE";
+    }
+
 }

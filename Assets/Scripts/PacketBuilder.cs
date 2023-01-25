@@ -21,9 +21,10 @@ public class PacketBuilder
     public static class Constants
     {
         // Tentative Formats for each Packet.
-        public static string PLAYERFORMAT = "{0} {1} {2}";
-        public static string PLAYERCONNECTFORMAT = "{0}{1}";
-        public static string PLAYERDISCONNECTFORMAT = "{0}{1}";
+        public static string PLAYER_FORMAT = "{0} {1} {2}";
+        public static string PLAYERCONNECT_FORMAT = "{0}{1}";
+        public static string PLAYERDISCONNECT_FORMAT = "{0}";
+        public static string GAMESTATE_FORMAT = "{0}";
         // Of order ContentTypeEnum, Packet Length 
         public static string PACKETHEADER = "{0}{1}";
         // Size of ContentTypeEnum, Packet Length data types
@@ -37,7 +38,8 @@ public class PacketBuilder
     {
         Player,
         PlayerConnect,
-        PlayerDisconnect
+        PlayerDisconnect,
+        GameState
     }
 
     private void buildPacketHeader(MemoryStream memoryStream, ContentTypeEnum contentTypeEnum, int payloadLength)
@@ -62,17 +64,17 @@ public class PacketBuilder
         GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent<GameManager>();
 
         // Init StringBuilder
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder payloadBuilder = new StringBuilder();
 
-        stringBuilder.Append(ContentTypeEnum.PlayerConnect);
+        payloadBuilder.Append(ContentTypeEnum.PlayerConnect);
 
         // Build payload
         foreach (Player player in gameManager.playerList) {
-            stringBuilder.Append(Constants.DELIM).AppendFormat(Constants.PLAYERFORMAT, ContentTypeEnum.Player.ToString(), player.id.ToString(), player.xcoord.ToString(), player.ycoord.ToString());
+            payloadBuilder.Append(Constants.DELIM).AppendFormat(Constants.PLAYER_FORMAT, ContentTypeEnum.Player.ToString(), player.id.ToString(), player.xcoord.ToString(), player.ycoord.ToString());
         }
 
         //TODO
-        memoryStream.Write(Encoding.ASCII.GetBytes(packString(stringBuilder.ToString())), 0, Constants.PACKETHEADERLENGTH);
+        memoryStream.Write(Encoding.ASCII.GetBytes(packString(payloadBuilder.ToString())), 0, Constants.PACKETHEADERLENGTH);
 
     }
 
@@ -89,14 +91,14 @@ public class PacketBuilder
         GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent<GameManager>();
 
         // Init StringBuilder
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder payloadBuilder = new StringBuilder();
 
         // Build payload
-        stringBuilder.AppendFormat(Constants.PLAYERDISCONNECTFORMAT, ContentTypeEnum.PlayerDisconnect, gameManager.localPlayer.id.ToString());
+        payloadBuilder.AppendFormat(Constants.PLAYERDISCONNECT_FORMAT, gameManager.localPlayer.id.ToString());
 
+        buildPacketHeader(memoryStream, ContentTypeEnum.PlayerDisconnect, payloadBuilder.Length);
         // Pack payload and write to memoryStream
-        //TODO
-        memoryStream.Write(Encoding.ASCII.GetBytes(packString(stringBuilder.ToString())), 0, Constants.PACKETHEADERLENGTH);
+        memoryStream.Write(Encoding.ASCII.GetBytes(payloadBuilder.ToString()));
     }
 
     /// <summary>
@@ -115,7 +117,7 @@ public class PacketBuilder
         StringBuilder payloadBuilder = new StringBuilder();
 
         // Build payload
-        payloadBuilder.AppendFormat(Constants.PLAYERFORMAT, gameManager.localPlayer.id.ToString(), gameManager.localPlayer.xcoord.ToString(), gameManager.localPlayer.ycoord.ToString());
+        payloadBuilder.AppendFormat(Constants.PLAYER_FORMAT, gameManager.localPlayer.id.ToString(), gameManager.localPlayer.xcoord.ToString(), gameManager.localPlayer.ycoord.ToString());
 
         // Pack header and write to memoryStream
         buildPacketHeader(memoryStream, ContentTypeEnum.Player, payloadBuilder.Length);
@@ -123,6 +125,23 @@ public class PacketBuilder
         // Pack payload and write to memoryStream
         memoryStream.Write(Encoding.ASCII.GetBytes(payloadBuilder.ToString()));
         //UnityEngine.Debug.Log(Encoding.ASCII.GetString(memoryStream.ToArray()));
+    }
+
+    private void buildGameStatePacket(MemoryStream memoryStream) {
+        // Get GameState Singleton
+        GameManager gameManager = (GameManager) GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        // Init StringBuilder
+        StringBuilder payloadBuilder = new StringBuilder();
+
+        // Build payload
+        payloadBuilder.AppendFormat(Constants.GAMESTATE_FORMAT, gameManager.ToString());
+
+        // Pack header and write to memoryStream
+        buildPacketHeader(memoryStream, ContentTypeEnum.GameState, payloadBuilder.Length);
+
+        // Pack payload and write to memoryStream
+        memoryStream.Write(Encoding.ASCII.GetBytes(payloadBuilder.ToString()));
     }
 
     private string packString(string str)
@@ -154,6 +173,9 @@ public class PacketBuilder
                     break;
                 case ContentTypeEnum.PlayerDisconnect:
                     buildPlayerDisconnectPacket(memoryStream);
+                    break;
+                case ContentTypeEnum.GameState:
+                    buildGameStatePacket(memoryStream);
                     break;
                 default:
                     break;
