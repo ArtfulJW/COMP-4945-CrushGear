@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -11,10 +10,15 @@ using UnityEngine;
 public class Server : MonoBehaviour
 {
     private IPEndPoint endPoint = null;
-    List<TcpClient> clientList = null;
+    private List<TcpClient> clientList = null;
+
+    private Queue<PacketBuilder.Packet> packetQueue = new Queue<PacketBuilder.Packet>();
+    private object queueLock = new System.Object();
 
     public void initServer(string IP, int port)
     {
+        // Instantiate clientList
+        clientList = new List<TcpClient>();
         // Create Server Endpoint
         endPoint = new IPEndPoint(IPAddress.Parse(IP), port);
         // Listens for Client Connections right away.
@@ -22,6 +26,7 @@ public class Server : MonoBehaviour
         // Sets ListenerThread as background thread.
         tcpListenerThread.IsBackground = true;
         tcpListenerThread.Start();
+        Debug.Log("Initializing Server");
     }
 
     // Delegate Method
@@ -46,23 +51,46 @@ public class Server : MonoBehaviour
 
 
     // Delegate Method
-    void processClient(object data)
+    void processClient(object client)
     {
-        int recv = 0;
-        byte[] buffer = new byte[1024];
-        if (data is TcpClient)
+        if (client is not TcpClient)
         {
-            using (NetworkStream stream = ((TcpClient)data).GetStream())
+            return;
+        }
+        using (NetworkStream stream = ((TcpClient) client).GetStream())
+        {
+            int recv = 0;
+            byte[] headerBuffer = new byte[PacketBuilder.Constants.PACKETHEADERLENGTH];
+            // Read until no more to read.
+            while ((recv = stream.Read(headerBuffer, 0, headerBuffer.Length)) != 0)
             {
-                // Read until no more to read.
-                while ((recv = stream.Read(buffer, 0, buffer.Length)) != 0)
-                {
-                    string recievedMsg = Encoding.ASCII.GetString(buffer);
-                    System.Diagnostics.Debug.WriteLine("Debug: Recieved Message.\n" + recievedMsg);
-                }
+                PacketBuilder.ContentTypeEnum type = (PacketBuilder.ContentTypeEnum) headerBuffer[0];
+                int contentLength = BitConverter.ToInt32(headerBuffer, 1);
+                //Debug.LogFormat("Debug: Type {0}, ContentLength {1}\n", type, contentLength);
+                byte[] data = new byte[contentLength];
+                stream.Read(data, 0, contentLength);
+                //Debug.LogFormat("Debug: {0}\n", Encoding.ASCII.GetString(buffer));
+                enqueuePacket(type, data);
             }
         }
 
+    }
+
+    void enqueuePacket(PacketBuilder.ContentTypeEnum type, byte[] data)
+    {
+        lock (queueLock)
+        {
+            packetQueue.Enqueue(new PacketBuilder.Packet(type, data));
+        }
+    }
+
+    void Send(byte[] payload)
+    {
+        foreach (TcpClient client in clientList)
+        {
+            NetworkStream stream = client.GetStream();
+            stream.Write(payload, 0, payload.Length);
+        }
     }
 
     // Start is called before the first frame update
@@ -74,6 +102,24 @@ public class Server : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        processPackets();
+        PacketBuilder packetBuilder = new PacketBuilder();
+        byte[] payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.GameState);
+        Send(payload);
+    }
 
+    void processPackets()
+    {
+        Queue<PacketBuilder.Packet> tempQ;
+        lock (queueLock)
+        {
+            tempQ = packetQueue;
+            packetQueue = new Queue<PacketBuilder.Packet>();
+        }
+        Debug.LogFormat("Debug: QueueLength: {0}", tempQ.Count);
+        foreach (PacketBuilder.Packet packet in tempQ)
+        {
+            Debug.LogFormat("Debug: Packet: {0} {1}\n", packet.contentType, Encoding.ASCII.GetString(packet.data));
+        }
     }
 }
