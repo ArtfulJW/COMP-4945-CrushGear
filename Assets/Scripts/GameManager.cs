@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
 
     private static GameManager gameManagerInstance;
     public static GameManager getInstance { get { return gameManagerInstance; } }
+
+    public string newConnectionID = "";
     
     /// <summary>
     /// Whenever localPlayer makes a change to the current gameState, notify all subscribers (Observers).
@@ -42,6 +44,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Process new connection ID
+    /// </summary>
+    /// <param name="id">ID of new connection</param>
+    public void processNewClientConnection(string id)
+    {
+        newConnectionID = id;
+        //  generate new player
+        //  send packet
+        byte[] msg = new PacketBuilder().buildPacket(PacketBuilder.ContentTypeEnum.PlayerIdAssignment);
+        Server.Send(msg, id);
+        newConnectionID = "";
+    }
     public override string ToString() {
         return "GAMESTATE";
     }
