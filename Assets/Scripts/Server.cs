@@ -5,12 +5,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using UnityEditor;
 using UnityEngine;
 
 public class Server : MonoBehaviour
 {
     private IPEndPoint endPoint = null;
-    private static Dictionary<string,TcpClient> clientMap = null;
+    private static Dictionary<string, TcpClient> clientMap = null;
     private PacketBuilder packetBuilder = null;
 
     private Queue<PacketBuilder.Packet> packetQueue = new Queue<PacketBuilder.Packet>();
@@ -49,13 +50,13 @@ public class Server : MonoBehaviour
             TcpClient client = tcpListener.AcceptTcpClient();
             //Enqueue connection for processing
             enqueueClient(client);
-            
+
         }
     }
 
     void enqueueClient(TcpClient client)
     {
-        lock(newClientLock)
+        lock (newClientLock)
         {
             newClientQueue.Enqueue(client);
         }
@@ -118,7 +119,7 @@ public class Server : MonoBehaviour
     public static void Send(byte[] payload, string id)
     {
         TcpClient client = null;
-        if(clientMap.TryGetValue(id, out client))
+        if (clientMap.TryGetValue(id, out client))
         {
             NetworkStream stream = client.GetStream();
             stream.Write(payload, 0, payload.Length);
@@ -128,14 +129,14 @@ public class Server : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        processClient();
+        processClients();
         processPackets();
         PacketBuilder packetBuilder = new PacketBuilder();
         byte[] payload = packetBuilder.buildPacket(PacketBuilder.ContentTypeEnum.GameState);
         Send(payload);
     }
 
-    void processClient()
+    void processClients()
     {
         Queue<TcpClient> tempQ;
         lock (newClientLock)
@@ -156,11 +157,14 @@ public class Server : MonoBehaviour
             GameManager.getInstance.processNewClientConnection(id);
         }
     }
-    
-    //TODO
+
+    /// <summary>
+    /// Generate new Guid
+    /// </summary>
+    /// <returns>String</returns>
     string generateID()
     {
-        return "NEWID";
+        return Guid.NewGuid().ToString();
     }
 
     void processPackets()
