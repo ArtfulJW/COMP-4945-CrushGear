@@ -13,9 +13,16 @@ public class Client : MonoBehaviour
     // Create Thread for receiving server messages
     private IPEndPoint endPoint = null;
     private TcpClient clientConnection = null;
+    // Client's visual model and controls.
+    public GameObject clientModel;
 
     private Queue<PacketBuilder.Packet> packetQueue = new Queue<PacketBuilder.Packet>();
     private object queueLock = new System.Object();
+
+    private void Start()
+    {
+        Instantiate(clientModel, new Vector3(0, 0, 0), Quaternion.identity);
+    }
 
     public void initClient(string IP, int port)
     {
