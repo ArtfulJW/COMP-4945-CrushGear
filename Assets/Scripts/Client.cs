@@ -48,6 +48,7 @@ public class Client : MonoBehaviour
                 byte[] headerBuffer = new byte[PacketBuilder.Constants.PACKETHEADERLENGTH];
                 while ((recv = stream.Read(headerBuffer, 0, headerBuffer.Length)) != 0)
                 {
+                    //TODO ERROR correction
                     PacketBuilder.ContentTypeEnum type = (PacketBuilder.ContentTypeEnum) headerBuffer[0];
                     int contentLength = BitConverter.ToInt32(headerBuffer, 1);
                     Debug.LogFormat("Debug: Type {0}, ContentLength {1}\n", type, contentLength);

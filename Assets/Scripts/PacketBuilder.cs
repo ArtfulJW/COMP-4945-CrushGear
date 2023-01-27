@@ -22,7 +22,7 @@ public class PacketBuilder
     {
         // Tentative Formats for each Packet.
         public static string PLAYER_FORMAT = "{0} {1} {2}";
-        public static string PLAYERCONNECT_FORMAT = "{0}{1}";
+        public static string PLAYERASSIGNMENT_FORMAT = "{0}";
         public static string PLAYERDISCONNECT_FORMAT = "{0}";
         public static string GAMESTATE_FORMAT = "{0}";
         // Of order ContentTypeEnum, Packet Length 
@@ -37,7 +37,7 @@ public class PacketBuilder
     public enum ContentTypeEnum : byte
     {
         Player,
-        PlayerConnect,
+        PlayerIdAssignment,
         PlayerDisconnect,
         GameState
     }
@@ -58,7 +58,7 @@ public class PacketBuilder
     /// </para>
     /// </summary>
     /// <param name="memoryStream"></param>
-    private void buildPlayerConnectPacket(MemoryStream memoryStream)
+    private void buildPlayerIdAssignmentPacket(MemoryStream memoryStream)
     {
         // Get GameState Singleton
         GameManager gameManager = (GameManager)GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -66,15 +66,12 @@ public class PacketBuilder
         // Init StringBuilder
         StringBuilder payloadBuilder = new StringBuilder();
 
-        payloadBuilder.Append(ContentTypeEnum.PlayerConnect);
-
         // Build payload
-        foreach (Player player in gameManager.playerList) {
-            payloadBuilder.Append(Constants.DELIM).AppendFormat(Constants.PLAYER_FORMAT, ContentTypeEnum.Player.ToString(), player.id.ToString(), player.xcoord.ToString(), player.ycoord.ToString());
-        }
+        payloadBuilder.AppendFormat(Constants.PLAYERASSIGNMENT_FORMAT, gameManager.newConnectionID);
+        // Build header
+        buildPacketHeader(memoryStream, ContentTypeEnum.PlayerIdAssignment, payloadBuilder.Length);
 
-        //TODO
-        memoryStream.Write(Encoding.ASCII.GetBytes(packString(payloadBuilder.ToString())), 0, Constants.PACKETHEADERLENGTH);
+        memoryStream.Write(Encoding.ASCII.GetBytes(payloadBuilder.ToString()));
 
     }
 
@@ -168,8 +165,8 @@ public class PacketBuilder
                 case ContentTypeEnum.Player:
                     buildPlayerPacket(memoryStream);
                     break;
-                case ContentTypeEnum.PlayerConnect:
-                    buildPlayerConnectPacket(memoryStream);
+                case ContentTypeEnum.PlayerIdAssignment:
+                    buildPlayerIdAssignmentPacket(memoryStream);
                     break;
                 case ContentTypeEnum.PlayerDisconnect:
                     buildPlayerDisconnectPacket(memoryStream);
