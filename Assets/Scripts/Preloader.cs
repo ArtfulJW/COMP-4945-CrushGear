@@ -1,112 +1,77 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using Unity.Netcode;
 using UnityEngine;
 
 
 public class Preloader : MonoBehaviour
 {
-    
-    public string[] acquireStats()
-    {
-        string[] stats = new string[2];
-        // Receive IP and port
-        Console.WriteLine("Enter IP:\n> ");
-        //TODO REMOVE
-        stats[0] = "127.0.0.1"; 
-        //stats[0] = Console.ReadLine();
-        Console.WriteLine("Enter Port:\n> ");
-        //TODO REMOVE
-        stats[1] = "25565";
-        //stats[1] = Console.ReadLine();
-        return stats;
-    }
+    private NetworkManager netManager;
 
-    /* Awake(): Monobehavior Event Function
+    /* Start(): Monobehavior Event Function
      * Executes when script instance is being loaded. Can be re-run by re-enabling 
      * 
-     * We overload Awake()
+     * We overload Start()
      */
-    void Awake()
+    void Start()
     {
-        /*
-         * Pull Command Line Arguments to execute desired functionality.
-         */
 
-        string[] args = System.Environment.GetCommandLineArgs();
-        string[] stats = acquireStats();
+        netManager = GetComponentInParent<NetworkManager>();
 
-        Server server = null;
-        Client client = null;
-        foreach (string str in args)
+        if (Application.isEditor)
+            return;
+
+        var args = GetCommandlineArgs();
+
+        if (args.TryGetValue("-mode", out string mode))
         {
-            
-            switch (str){
-                case "-server":
-                    try {
-                        // Load Server with IP and port
-                        server = GetComponent<Server>();
-                        server.initServer(stats[0], Convert.ToInt32(stats[1]));
-                        server.enabled = true;
-                        if (server.enabled) Debug.Log("Server enabled");
-                    } catch (Exception e) {
-                        Debug.Log(e.ToString());
-                    }
-                    
+            switch (mode)
+            {
+                case "server":
+                    netManager.StartServer();
                     break;
-                case "-client-host":
-                    try {
-                        // Load Server with IP and port
-                        server = GetComponent<Server>();
-                        server.initServer(stats[0], Convert.ToInt32(stats[1]));
-                        server.enabled = true;
-                        if (server.enabled) Debug.Log("Server enabled");
-                    } catch (Exception e) {
-                        Debug.Log(e.ToString());
-                    }
-                    try {
-                        // Load client with IP and port
-                        client = GetComponent<Client>();
-                        client.initClient(stats[0], Convert.ToInt32(stats[1]));
-                        client.enabled = true;
-                        if (client.enabled) Debug.Log("Client enabled");
-                    } catch (Exception e) {
-                        Debug.Log(e.ToString());
-                    }
-                    
+                case "host":
+                    netManager.StartHost();
                     break;
-                case "-client":
-                    try {
-                        // Load client with IP and port
-                        client = GetComponent<Client>();
-                        client.initClient(stats[0], Convert.ToInt32(stats[1]));
-                        client.enabled = true;
-                        if (client.enabled) Debug.Log("Client enabled");
-                    }
-                    catch (Exception e) {
-                        Debug.Log(e.ToString());
-                    }
-                    break;
-                default:
-                    Debug.Log(str + ": Invalid argument");
+                case "client":
+
+                    netManager.StartClient();
                     break;
             }
         }
 
     }
 
+    private Dictionary<string, string> GetCommandlineArgs()
+    {
+        Dictionary<string, string> argDictionary = new Dictionary<string, string>();
 
-    
+        var args = System.Environment.GetCommandLineArgs();
+
+        for (int i = 0; i < args.Length; ++i)
+        {
+            var arg = args[i].ToLower();
+            if (arg.StartsWith("-"))
+            {
+                var value = i < args.Length - 1 ? args[i + 1].ToLower() : null;
+                value = (value?.StartsWith("-") ?? false) ? null : value;
+
+                argDictionary.Add(arg, value);
+            }
+        }
+        return argDictionary;
+    }
+
+
+
     // Start is called before the first frame update
     // void Start()
     // {
-        
+
     // }
 
     // Update is called once per frame
     // void Update()
     // {
-        
+
     // }
 }
