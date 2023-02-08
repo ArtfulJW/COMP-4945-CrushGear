@@ -9,15 +9,25 @@ public class CarController : NetworkBehaviour {
     public float maxSteeringAngle; // maximum steer angle the wheel can have
 
     public void FixedUpdate() {
+        inGameUpdate();
+    }
+
+    private void inGameUpdate()
+    {
+        if (!IsLocalPlayer || !IsOwner)
+            return;
         float motor = maxMotorTorque * Input.GetAxis("Vertical");
         float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
 
-        foreach (AxleInfo axleInfo in axleInfos) {
-            if (axleInfo.steering) {
+        foreach (AxleInfo axleInfo in axleInfos)
+        {
+            if (axleInfo.steering)
+            {
                 axleInfo.leftWheel.steerAngle = steering;
                 axleInfo.rightWheel.steerAngle = steering;
             }
-            if (axleInfo.motor) {
+            if (axleInfo.motor)
+            {
                 axleInfo.leftWheel.motorTorque = motor;
                 axleInfo.rightWheel.motorTorque = motor;
             }
