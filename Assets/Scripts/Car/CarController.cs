@@ -3,16 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class CarController : NetworkBehaviour {
+public class CarController : NetworkBehaviour
+{
+
+    [SerializeField]
+    private Vector2 defaultInitialPositionOnPlane = new Vector2(-4, 4);
+
     public List<AxleInfo> axleInfos; // the information about each individual axle
     public float maxMotorTorque; // maximum torque the motor can apply to wheel
     public float maxSteeringAngle; // maximum steer angle the wheel can have
 
-    public void FixedUpdate() {
-        inGameUpdate();
+    [SerializeField]
+    private NetworkVariable<Vector3> networkPositionDirection = new NetworkVariable<Vector3>();
+
+    private Vector3 oldInputPosition = Vector3.zero;
+    //private Vector3 oldInputRotation = Vector3.zero;
+
+    private void Start()
+    {
+        transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
+                   Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
+    }
+    private void FixedUpdate()
+    {
+        if (IsClient && IsOwner)
+        {
+            clientUpdate();
+        }
     }
 
-    private void inGameUpdate()
+    private void clientUpdate()
     {
         if (!IsLocalPlayer || !IsOwner)
             return;
@@ -32,11 +52,25 @@ public class CarController : NetworkBehaviour {
                 axleInfo.rightWheel.motorTorque = motor;
             }
         }
+        Vector3 newPosition = transform.TransformDirection(transform.position);
+        if (oldInputPosition != newPosition )//|| oldInputRotation != inputRotation)
+        {
+            oldInputPosition = newPosition;
+            UpdateClientPositionAndRotationServerRpc(newPosition);
+        }
+    }
+
+    [ServerRpc]
+    public void UpdateClientPositionAndRotationServerRpc(Vector3 newPosition)
+    {
+        networkPositionDirection.Value = newPosition;
+        //networkRotationDirection.Value = newRotation;
     }
 }
 
 [System.Serializable]
-public class AxleInfo {
+public class AxleInfo
+{
     public WheelCollider leftWheel;
     public WheelCollider rightWheel;
     public bool motor; // is this wheel attached to motor?

@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Preloader : MonoBehaviour
 {
-    private NetworkManager netManager;
-
     /* Start(): Monobehavior Event Function
      * Executes when script instance is being loaded. Can be re-run by re-enabling 
      * 
@@ -14,9 +12,6 @@ public class Preloader : MonoBehaviour
      */
     void Start()
     {
-
-        netManager = GetComponentInParent<NetworkManager>();
-
         if (Application.isEditor)
             return;
 
@@ -27,14 +22,13 @@ public class Preloader : MonoBehaviour
             switch (mode)
             {
                 case "server":
-                    netManager.StartServer();
+                    NetworkManager.Singleton.StartServer();
                     break;
                 case "host":
-                    netManager.StartHost();
+                    NetworkManager.Singleton.StartHost();
                     break;
                 case "client":
-
-                    netManager.StartClient();
+                    NetworkManager.Singleton.StartClient();
                     break;
             }
         }
