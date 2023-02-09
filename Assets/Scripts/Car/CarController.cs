@@ -21,8 +21,12 @@ public class CarController : NetworkBehaviour
 
     private void Start()
     {
-        transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
+        if (IsClient && IsOwner)
+        {
+            transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
                    Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
+            CameraController.Instance.FollowPlayer(transform.Find("CameraRoot"));
+        }
     }
     private void FixedUpdate()
     {
@@ -30,7 +34,17 @@ public class CarController : NetworkBehaviour
         {
             clientUpdate();
         }
+
+        //if (IsServer)
+        //{
+        //    serverUpdate();
+        //}
     }
+
+    //private void serverUpdate()
+    //{
+    //    transform.position = networkPositionDirection.Value;
+    //}
 
     private void clientUpdate()
     {
@@ -53,7 +67,7 @@ public class CarController : NetworkBehaviour
             }
         }
         Vector3 newPosition = transform.TransformDirection(transform.position);
-        if (oldInputPosition != newPosition )//|| oldInputRotation != inputRotation)
+        if (oldInputPosition != newPosition)//|| oldInputRotation != inputRotation)
         {
             oldInputPosition = newPosition;
             UpdateClientPositionAndRotationServerRpc(newPosition);
