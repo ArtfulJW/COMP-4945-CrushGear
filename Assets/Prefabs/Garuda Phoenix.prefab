@@ -70,8 +70,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63851a58e34c0d14282c5fdd393ecdab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  motorForce: 1000
-  breakForce: 3000
+  motorForce: 400
+  breakForce: 600
   maxSteerAngle: 30
   frontLeftWheelCollider: {fileID: 4679215373402642881}
   frontRightWheelCollider: {fileID: 7880548951079650721}
@@ -81,6 +81,12 @@ MonoBehaviour:
   frontRightWheeTransform: {fileID: 3661536773353766651}
   rearLeftWheelTransform: {fileID: 8281733569134544016}
   rearRightWheelTransform: {fileID: 1198229798291246489}
+  networkAcceleration:
+    m_InternalValue: 0
+  networkSteering:
+    m_InternalValue: 0
+  networkBrakeForce:
+    m_InternalValue: 0
   defaultInitialPositionOnPlane: {x: -4, y: 4}
 --- !u!114 &8392902504039035858
 MonoBehaviour:
@@ -553,7 +559,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6799586866321909079}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.344, z: -0.997}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -736,7 +742,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8510561369097523716}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.29}
+  m_LocalPosition: {x: 0, y: 0, z: -0.593}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
