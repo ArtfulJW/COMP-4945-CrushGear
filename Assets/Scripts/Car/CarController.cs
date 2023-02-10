@@ -2,23 +2,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.Playables;
 
 public class CarController : NetworkBehaviour
 {
 
+    private const string HORIZONTAL = "Horizontal";
+    private const string VERTICAL = "Vertical";
+
+    private float horizontalInput;
+    private float verticalInput;
+    private float currentSteerAngle;
+    private float currentbreakForce;
+    private bool isBreaking;
+
+    [SerializeField] private float motorForce;
+    [SerializeField] private float breakForce;
+    [SerializeField] private float maxSteerAngle;
+
+    [SerializeField] private WheelCollider frontLeftWheelCollider;
+    [SerializeField] private WheelCollider frontRightWheelCollider;
+    [SerializeField] private WheelCollider rearLeftWheelCollider;
+    [SerializeField] private WheelCollider rearRightWheelCollider;
+
+    [SerializeField] private Transform frontLeftWheelTransform;
+    [SerializeField] private Transform frontRightWheeTransform;
+    [SerializeField] private Transform rearLeftWheelTransform;
+    [SerializeField] private Transform rearRightWheelTransform;
+
+
+    [SerializeField]
+    private NetworkVariable<float> networkAcceleration = new NetworkVariable<float>();
+    [SerializeField]
+    private NetworkVariable<float> networkSteering = new NetworkVariable<float>();
+    [SerializeField]
+    private NetworkVariable<float> networkBrakeForce = new NetworkVariable<float>();
+
     [SerializeField]
     private Vector2 defaultInitialPositionOnPlane = new Vector2(-4, 4);
-
-    public List<AxleInfo> axleInfos; // the information about each individual axle
-    public float maxMotorTorque; // maximum torque the motor can apply to wheel
-    public float maxSteeringAngle; // maximum steer angle the wheel can have
-
-    [SerializeField]
-    private NetworkVariable<Vector3> networkPositionDirection = new NetworkVariable<Vector3>();
-
-    private Vector3 oldInputPosition = Vector3.zero;
-    //private Vector3 oldInputRotation = Vector3.zero;
-
     private void Start()
     {
         if (IsClient && IsOwner)
@@ -30,63 +51,105 @@ public class CarController : NetworkBehaviour
     }
     private void FixedUpdate()
     {
-        if (IsClient && IsOwner)
+        if(IsClient && IsOwner)
         {
-            clientUpdate();
+            GetInput();
+            
         }
+        ClientMove();
+        //UpdateWheels();
 
-        //if (IsServer)
-        //{
-        //    serverUpdate();
-        //}
     }
 
-    //private void serverUpdate()
-    //{
-    //    transform.position = networkPositionDirection.Value;
-    //}
-
-    private void clientUpdate()
+    /// <summary>
+    /// CLIENTSIDE: Set movement for car
+    /// </summary>
+    private void ClientMove()
     {
-        if (!IsLocalPlayer || !IsOwner)
-            return;
-        float motor = maxMotorTorque * Input.GetAxis("Vertical");
-        float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
-
-        foreach (AxleInfo axleInfo in axleInfos)
-        {
-            if (axleInfo.steering)
-            {
-                axleInfo.leftWheel.steerAngle = steering;
-                axleInfo.rightWheel.steerAngle = steering;
-            }
-            if (axleInfo.motor)
-            {
-                axleInfo.leftWheel.motorTorque = motor;
-                axleInfo.rightWheel.motorTorque = motor;
-            }
-        }
-        Vector3 newPosition = transform.TransformDirection(transform.position);
-        if (oldInputPosition != newPosition)//|| oldInputRotation != inputRotation)
-        {
-            oldInputPosition = newPosition;
-            UpdateClientPositionAndRotationServerRpc(newPosition);
-        }
+        HandleMotor();
+        HandleSteering();
     }
 
+    /// <summary>
+    /// CLIENTSIDE: 
+    /// Receive inputs by user and pass values to server.
+    /// </summary>
+    private void GetInput()
+    {
+        horizontalInput = Input.GetAxis(HORIZONTAL);
+        verticalInput = Input.GetAxis(VERTICAL);
+        isBreaking = Input.GetKey(KeyCode.Space);
+        currentbreakForce = isBreaking ? breakForce : 0f;
+        UpdateClientServerRpc(verticalInput * motorForce, maxSteerAngle * horizontalInput, currentbreakForce);
+    }
+
+    /// <summary>
+    /// CLIENTSIDE: 
+    /// Set motor with value set by server
+    /// </summary>
+    private void HandleMotor()
+    {
+        frontLeftWheelCollider.motorTorque = networkAcceleration.Value;
+        frontRightWheelCollider.motorTorque = networkAcceleration.Value;
+        ApplyBreaking();
+    }
+
+    /// <summary>
+    /// CLIENTSIDE: 
+    /// Set brakeTorque with value set by server
+    /// </summary>
+    private void ApplyBreaking()
+    {
+        frontRightWheelCollider.brakeTorque = networkBrakeForce.Value;
+        frontLeftWheelCollider.brakeTorque = networkBrakeForce.Value;
+        rearLeftWheelCollider.brakeTorque = networkBrakeForce.Value;
+        rearRightWheelCollider.brakeTorque = networkBrakeForce.Value;
+    }
+
+    /// <summary>
+    /// CLIENTSIDE: 
+    /// Set steerAngle with value set by server
+    /// </summary>
+    private void HandleSteering()
+    {
+        frontLeftWheelCollider.steerAngle = networkSteering.Value;
+        frontRightWheelCollider.steerAngle = networkSteering.Value;
+    }
+
+    /// <summary>
+    /// CLIENTSIDE: Updates the transform of every wheel based on it's respective wheel collider
+    /// </summary>
+    private void UpdateWheels()
+    {
+        UpdateSingleWheel(frontLeftWheelCollider, frontLeftWheelTransform);
+        UpdateSingleWheel(frontRightWheelCollider, frontRightWheeTransform);
+        UpdateSingleWheel(rearRightWheelCollider, rearRightWheelTransform);
+        UpdateSingleWheel(rearLeftWheelCollider, rearLeftWheelTransform);
+    }
+
+    /// <summary>
+    /// CLINETSIDE: Updates wheelTransform position and rotation based on wheelCollider
+    /// </summary>
+    private void UpdateSingleWheel(WheelCollider wheelCollider, Transform wheelTransform)
+    {
+        Vector3 pos;
+        Quaternion rot;
+        wheelCollider.GetWorldPose(out pos, out rot);
+        wheelTransform.rotation *= Quaternion.Euler(rot.eulerAngles.x,0,0);
+        wheelTransform.position = pos;
+    }
+
+    /// <summary>
+    /// SERVERSIDE: Set server sync variables with respective params
+    /// </summary>
+    /// <param name="acceleration"></param>
+    /// <param name="steerAngle"></param>
+    /// <param name="currentBrakeForce"></param>
     [ServerRpc]
-    public void UpdateClientPositionAndRotationServerRpc(Vector3 newPosition)
+    public void UpdateClientServerRpc(float acceleration, float steerAngle, float currentBrakeForce)
     {
-        networkPositionDirection.Value = newPosition;
-        //networkRotationDirection.Value = newRotation;
+        networkAcceleration.Value = acceleration;
+        networkSteering.Value = steerAngle;
+        networkBrakeForce.Value = currentBrakeForce;
     }
-}
-
-[System.Serializable]
-public class AxleInfo
-{
-    public WheelCollider leftWheel;
-    public WheelCollider rightWheel;
-    public bool motor; // is this wheel attached to motor?
-    public bool steering; // does this wheel apply steer angle?
 }
