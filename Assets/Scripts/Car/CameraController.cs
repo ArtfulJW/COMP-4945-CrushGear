@@ -1,31 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
+using Cinemachine;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour {
-    public Transform lookAt;
-    public Transform Player;
+public class CameraController : Singleton<CameraController> {
+    [SerializeField]
+    private float amplitudeGain = 0.5f;
 
-    private const float YMin = -50.0f;
-    private const float YMax = 0f;
+    [SerializeField]
+    private float frequencyGain = 0.5f;
 
-    public float distance = 10.0f;
-    private float currentX = 0.0f;
-    private float currentY = 0.0f;
-    public float rotateSpeed = 5;
+    private CinemachineFreeLook camera;
+    private Transform cameraTarget;
 
-    void LateUpdate() {
+    private void Awake()
+    {
+        camera = GetComponent<CinemachineFreeLook>();
+    }
 
-        currentX += Input.GetAxis("Mouse X") * rotateSpeed * Time.deltaTime;
-        currentY += Input.GetAxis("Mouse Y") * rotateSpeed * Time.deltaTime;
-        currentY = Mathf.Clamp(currentY, YMin, YMax);
+    //private void LateUpdate()
+    //{
+    //    xRotation -= mousePosition.y;
+    //    xRotation = Mathf.Clamp(xRotation, -30f, 50f);
+    //    Vector3 targetRotation = head.transform.eulerAngles;
+    //    targetRotation.x = xRotation;
+    //    head.eulerAngles = targetRotation;
+    //    cameraTarget.eulerAngles = targetRotation;
+    //    /*       Debug.Log(playerCamera.eulerAngles);*/
+    //    cameraTarget.Rotate(Vector3.up, mousePosition.x * Time.deltaTime * mouseSensitivityX);
+    //}
 
-        Vector3 Direction = new Vector3(0, 0, -distance);
-        Quaternion rotation = Quaternion.Euler(-currentY, currentX, 0);
-        transform.position = lookAt.position + rotation * Direction;
+    public void FollowPlayer(Transform transform)
+    {
+        // not all scenes have a cinemachine virtual camera so return in that's the case
+        if (camera == null)
+            return;
+        cameraTarget = transform;
 
-        transform.LookAt(lookAt.position);
+        camera.Follow = cameraTarget;
+        camera.LookAt = cameraTarget;
+
+        //var perlin = camera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+        //perlin.m_AmplitudeGain = amplitudeGain;
+        //perlin.m_FrequencyGain = frequencyGain;
     }
 }
