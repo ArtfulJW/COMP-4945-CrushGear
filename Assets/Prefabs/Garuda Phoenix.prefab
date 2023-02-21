@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63851a58e34c0d14282c5fdd393ecdab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  motorForce: 400
+  motorForce: 600
   breakForce: 600
   maxSteerAngle: 30
   frontLeftWheelCollider: {fileID: 4679215373402642881}
@@ -592,7 +592,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6811248022897400829}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.1, y: 0.2, z: 0.3}
+  m_LocalPosition: {x: 1.1, y: 0.2, z: 0.625}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -668,7 +668,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8250772790102615557}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.1, y: 0.2, z: 0.3}
+  m_LocalPosition: {x: -1.1, y: 0.2, z: 0.625}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
