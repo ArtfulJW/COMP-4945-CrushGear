@@ -22,6 +22,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI playersInGameText;
 
+    [SerializeField]
+    private GameObject timerPanel;
+
     private bool hasServerStarted;
 
     private void Awake()
@@ -51,8 +54,7 @@ public class UIManager : MonoBehaviour
             if (NetworkManager.Singleton.StartHost())
             {
                 Debug.Log("Host started...");
-                startHostButton.gameObject.SetActive(false);
-                startClientButton.gameObject.SetActive(false);
+                activateRacingUI();
             }
             else
             {
@@ -69,8 +71,7 @@ public class UIManager : MonoBehaviour
             if (NetworkManager.Singleton.StartClient())
             {
                 Debug.Log("Client started...");
-                startHostButton.gameObject.SetActive(false);
-                startClientButton.gameObject.SetActive(false);
+                activateRacingUI();
             }
             else
             {
@@ -94,5 +95,13 @@ public class UIManager : MonoBehaviour
     void Update()
     {
         playersInGameText.text = $"Players in game: {PlayersManager.Instance.PlayersInGame}";
+    }
+
+    void activateRacingUI()
+    {
+        startHostButton.gameObject.SetActive(false);
+        startClientButton.gameObject.SetActive(false);
+        playersInGameText.gameObject.SetActive(true);
+        timerPanel.SetActive(true);
     }
 }

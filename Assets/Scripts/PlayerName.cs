@@ -2,7 +2,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerHud : NetworkBehaviour
+public class PlayerName : NetworkBehaviour
 {
     [SerializeField]
     private NetworkVariable<NetworkString> playerNetworkName = new NetworkVariable<NetworkString>();
