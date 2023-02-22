@@ -49,9 +49,16 @@ public class UIManager : MonoBehaviour
             //    await RelayManager.Instance.SetupRelay();
 
             if (NetworkManager.Singleton.StartHost())
+            {
                 Debug.Log("Host started...");
+                startHostButton.gameObject.SetActive(false);
+                startClientButton.gameObject.SetActive(false);
+            }
             else
+            {
                 Debug.Log("Unable to start host...");
+            }
+
         });
 
         // START CLIENT
@@ -60,9 +67,16 @@ public class UIManager : MonoBehaviour
             //    await RelayManager.Instance.JoinRelay(joinCodeInput.text);
 
             if (NetworkManager.Singleton.StartClient())
+            {
                 Debug.Log("Client started...");
+                startHostButton.gameObject.SetActive(false);
+                startClientButton.gameObject.SetActive(false);
+            }
             else
+            {
                 Debug.Log("Unable to start client...");
+            }
+
         });
 
         // STATUS TYPE CALLBACKS
