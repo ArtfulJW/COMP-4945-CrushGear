@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -67,8 +68,27 @@ public class GenerateRoad : MonoBehaviour
             {
                 Gizmos.color = UnityEngine.Color.yellow;
                 Gizmos.DrawLine(convexHull[convexHull.Count - 1], convexHull[0]);
-
             }
+        }
+
+        Gizmos.color = UnityEngine.Color.yellow;
+        double y = 0;
+        while (y < 1)
+        {
+            
+            for (int x = 0; x < convexHull.Count; x++)
+            {
+                
+                if (convexHull[x] != convexHull.Last())
+                {
+                    Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+                } else
+                {
+                    Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+                }
+            }
+
+            y += .05;
         }
 
     }
@@ -190,20 +210,49 @@ public class GenerateRoad : MonoBehaviour
 
     }
 
-    void removeDuplicate(List<Vector3> list) 
+    Vector3 Render4PTBezier(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float time) 
     {
-        if (list.Count > 1) {
-            for (int x = 0; x < list.Count; x++)
-            {
-                for (int y = 0; y < list.Count; y++)
-                {
-                    if (list[x].Equals(list[y]))
-                    {
-                        list.RemoveAt(x);
-                    }
-                }
-            }
-        }
+        // Linearly interpolate between all the points
+        Vector3 v1 = Vector3.Lerp(p0,p1,time);
+        Vector3 v2 = Vector3.Lerp(p1,p2,time);
+        Vector3 v3 = Vector3.Lerp(p2,p3,time);
+
+        // Linerly interpolate between these three points
+        Vector3 v4 = Vector3.Lerp(v1, v2, time);
+        Vector3 v5 = Vector3.Lerp(v2, v3, time);
+
+        // Linearly interpolate between these two points
+        Vector3 finalVector = Vector3.Lerp(v4, v5, time);
+
+        return finalVector;
+
     }
 
+    Vector3 Render3PTBezier(Vector3 p0, Vector3 p1, Vector3 p2, float time)
+    {
+        // Linearly interpolate between all the points
+        Vector3 v1 = Vector3.Lerp(p0, p1, time);
+        Vector3 v2 = Vector3.Lerp(p1, p2, time);
+
+        // Linerly interpolate between these two points
+        Vector3 finalVector = Vector3.Lerp(v1, v2, time);
+
+        return finalVector;
+
+    }
+
+    void draw4PTCurve(int x, float y)
+    {
+        Gizmos.DrawCube(Render4PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], convexHull[x + 3], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+    }
+
+    void draw3PTCurve(int x, float y)
+    {
+        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+    }
+
+    void draw3PTLastCurve(int x, float y)
+    {
+        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull.Last(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+    }
 }
