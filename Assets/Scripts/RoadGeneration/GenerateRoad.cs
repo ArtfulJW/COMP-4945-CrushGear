@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -15,12 +16,24 @@ public class GenerateRoad : MonoBehaviour
     [SerializeField]
     private GameObject RoadMesh;
 
+    [SerializeField]
+    private GameObject Goal;
+
+    [SerializeField]
+    private GameObject Gate;
+
+
+    // Reference to another Script (TrackInfo.cs)
+    private TrackInfo TrackManager;
+
     private Vector3[] GeneratedPoints;
     private List<Vector3> convexHull;
 
     private void Awake()
     {
         MeshObject = GameObject.Find("MeshBounds");
+
+        TrackManager = GameObject.Find("TrackManager").GetComponent<TrackInfo>();
 
         // Generate Points given the 2D Plane's bounds
         GeneratedPoints = GeneratePoints(12, MeshObject);
@@ -35,6 +48,9 @@ public class GenerateRoad : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        TrackManager.goal = Instantiate(Goal, convexHull.First(), Quaternion.identity); 
+
         double y = 0;
         while (y < 1)
         {
@@ -44,11 +60,13 @@ public class GenerateRoad : MonoBehaviour
                 if (convexHull[x] != convexHull.Last())
                 {
                     Instantiate(RoadMesh, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity);
+                    TrackManager.triggers.Add(Instantiate(Gate, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity));
                     //Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
                 }
                 else
                 {
                     Instantiate(RoadMesh, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity);
+                    TrackManager.triggers.Add(Instantiate(Gate, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity));
                     //Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
                 }
             }

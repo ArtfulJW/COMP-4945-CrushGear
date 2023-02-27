@@ -23,7 +23,7 @@ public class Player : NetworkBehaviour
     private void Start()
     {
         // Init track info
-        trackInfo = GameObject.Find("Track").GetComponent<TrackInfo>();
+        trackInfo = GameObject.Find("TrackManager").GetComponent<TrackInfo>();
         triggerAmount = trackInfo.triggers.Count;
     }
 
