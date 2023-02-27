@@ -8,8 +8,9 @@ using UnityEngine;
 
 public class GenerateRoad : MonoBehaviour
 {
-
+    [SerializeField]
     private GameObject MeshObject;
+
     private Vector3[] GeneratedPoints;
     private List<Vector3> convexHull;
 
@@ -18,13 +19,12 @@ public class GenerateRoad : MonoBehaviour
         MeshObject = GameObject.Find("MeshBounds");
 
         // Generate Points given the 2D Plane's bounds
-        GeneratedPoints = GeneratePoints(10, MeshObject);
+        GeneratedPoints = GeneratePoints(12, MeshObject);
 
-        convexHull = GenerateConvexHull(GeneratedPoints);
-        foreach (Vector3 p in convexHull)
-        {
-            UnityEngine.Debug.Log(p);
-        }
+        // Remove Duplicates!
+        convexHull = GenerateConvexHull(GeneratedPoints).Distinct().ToList();
+        
+        UnityEngine.Debug.Log("Length: " + convexHull.Count);
 
     }
 
@@ -56,6 +56,21 @@ public class GenerateRoad : MonoBehaviour
             Gizmos.DrawCube(p, new Vector3((float)0.35, (float)0.35, (float)0.35));
         }
 
+        for (int x = 0; x < convexHull.Count(); x++)
+        {
+            Gizmos.color = UnityEngine.Color.green;
+            if (x < convexHull.Count-1)
+            {
+                Gizmos.DrawLine(convexHull[x], convexHull[x + 1]);
+            }
+            else
+            {
+                Gizmos.color = UnityEngine.Color.yellow;
+                Gizmos.DrawLine(convexHull[convexHull.Count - 1], convexHull[0]);
+
+            }
+        }
+
     }
 
 
@@ -80,6 +95,7 @@ public class GenerateRoad : MonoBehaviour
 
             // Modify to accomdate any potential transfoms
             pointList[x] += MeshObject.transform.position;
+            pointList[x].Scale(MeshObject.transform.localScale);
         }
 
         return pointList;
@@ -106,7 +122,7 @@ public class GenerateRoad : MonoBehaviour
         float x1 = currentPoint.x - targetPoint.x;
         float x2 = currentPoint.x - checkedPoint.x;
 
-        UnityEngine.Debug.Log($"z2:{z2}*x1:{x1}-z1:{z1}*x2:{x2}={(z2 * x1) - (z1 * x2)}");
+        //UnityEngine.Debug.Log($"z2:{z2}*x1:{x1}-z1:{z1}*x2:{x2}={(z2 * x1) - (z1 * x2)}");
         return (z2 * x1) - (z1 * x2);
     }
 
@@ -117,7 +133,7 @@ public class GenerateRoad : MonoBehaviour
     List<Vector3> GenerateConvexHull(Vector3[] generatedPoints)
     {
         // Build this list to return
-        List<Vector3> convexHull = new List<Vector3>();
+        List<Vector3> convexHullList = new List<Vector3>();
         Vector3 leftmostPoint = generatedPoints[0];
 
         // Look for the left most point to start from
@@ -133,7 +149,7 @@ public class GenerateRoad : MonoBehaviour
         //startPoint = leftmostPoint;
 
         // Found the first point, can start doing Jarvis March.
-        convexHull.Add(leftmostPoint);
+        convexHullList.Add(leftmostPoint);
 
         // Loop until we finish building the Convex Hull, then break.
         for (int x = 0; x < generatedPoints.Length; x++)
@@ -144,10 +160,10 @@ public class GenerateRoad : MonoBehaviour
              */
 
             Vector3 targetPoint = generatedPoints[x];
-            
+
             for (int y = 0; y < generatedPoints.Length; y++)
             {
-                float crossProduct = CalculateCrossProduct(convexHull[convexHull.Count()-1], targetPoint, generatedPoints[y]);
+                float crossProduct = CalculateCrossProduct(convexHullList.Last(), targetPoint, generatedPoints[y]);
 
                 if (crossProduct > 0)
                 {
@@ -157,20 +173,37 @@ public class GenerateRoad : MonoBehaviour
 
             }
 
-            if (targetPoint.Equals(convexHull.Last()))
+            if (targetPoint.Equals(convexHullList.Last()))
             {
                 // We have found the entirety of the Convex Hull.
                 break;
-            } else
+            }
+            else
             {
                 // Found the next point to be added. 
-                convexHull.Add(targetPoint);
+                convexHullList.Add(targetPoint);
             }
-            
+
         }
 
-        return convexHull;
+        return convexHullList;
 
+    }
+
+    void removeDuplicate(List<Vector3> list) 
+    {
+        if (list.Count > 1) {
+            for (int x = 0; x < list.Count; x++)
+            {
+                for (int y = 0; y < list.Count; y++)
+                {
+                    if (list[x].Equals(list[y]))
+                    {
+                        list.RemoveAt(x);
+                    }
+                }
+            }
+        }
     }
 
 }
