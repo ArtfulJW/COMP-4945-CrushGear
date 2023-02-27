@@ -57,7 +57,7 @@ public class CarController : NetworkBehaviour
             
         }
         ClientMove();
-        //UpdateWheels();
+        UpdateWheels();
 
     }
 
