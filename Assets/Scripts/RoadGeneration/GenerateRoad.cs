@@ -9,8 +9,11 @@ using UnityEngine;
 
 public class GenerateRoad : MonoBehaviour
 {
-    [SerializeField]
+    
     private GameObject MeshObject;
+
+    [SerializeField]
+    private GameObject RoadMesh;
 
     private Vector3[] GeneratedPoints;
     private List<Vector3> convexHull;
@@ -32,7 +35,26 @@ public class GenerateRoad : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        double y = 0;
+        while (y < 1)
+        {
+            for (int x = 0; x < convexHull.Count; x++)
+            {
 
+                if (convexHull[x] != convexHull.Last())
+                {
+                    Instantiate(RoadMesh, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity);
+                    //Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+                }
+                else
+                {
+                    Instantiate(RoadMesh, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity);
+                    //Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+                }
+            }
+
+            y += .01;
+        }
     }
 
     // Update is called once per frame
@@ -111,7 +133,7 @@ public class GenerateRoad : MonoBehaviour
         for (int x = 0; x < numPoints; x++)
         {
             // Generate Point
-            pointList[x] = new Vector3(UnityEngine.Random.Range(minimum.x, maximum.x), mesh.transform.position.y, UnityEngine.Random.Range(minimum.z, maximum.z));
+            pointList[x] = new Vector3(UnityEngine.Random.Range(minimum.x, maximum.x), 0, UnityEngine.Random.Range(minimum.z, maximum.z));
 
             // Modify to accomdate any potential transfoms
             pointList[x] += MeshObject.transform.position;
