@@ -799,11 +799,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: 9a86921d-e3e9-497a-9e00-c0aea4c6abcf
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: CrushGear
+  organizationId: tissure
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
