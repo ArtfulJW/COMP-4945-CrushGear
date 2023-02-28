@@ -11,7 +11,7 @@ using UnityEngine;
 public class GenerateRoad : MonoBehaviour
 {
     
-    private GameObject MeshObject;
+    public GameObject MeshObject;
 
     [SerializeField]
     private GameObject RoadMesh;
@@ -22,12 +22,11 @@ public class GenerateRoad : MonoBehaviour
     [SerializeField]
     private GameObject Gate;
 
-
     // Reference to another Script (TrackInfo.cs)
     private TrackInfo TrackManager;
 
     private Vector3[] GeneratedPoints;
-    private List<Vector3> convexHull;
+    public List<Vector3> convexHull;
 
     private void Awake()
     {
@@ -295,4 +294,15 @@ public class GenerateRoad : MonoBehaviour
     {
         Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull.Last(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
     }
+
+    float calcAngle(Vector3 previousVector, Vector3 nextVector)
+    {
+        float rise = nextVector.z - previousVector.z;
+        float run = nextVector.x - previousVector.x;
+
+        UnityEngine.Debug.Log(UnityEngine.Mathf.Tan(rise / run));
+
+        return UnityEngine.Mathf.Tan(rise / run);
+    }
+
 }
