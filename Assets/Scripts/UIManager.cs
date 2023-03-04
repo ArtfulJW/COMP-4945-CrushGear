@@ -99,6 +99,7 @@ public class UIManager : MonoBehaviour
 
     void activateRacingUI()
     {
+        //Switch scenes to game from lobby scene
         startHostButton?.gameObject.SetActive(false);
         startClientButton?.gameObject.SetActive(false);
         joinCodeInput?.gameObject.SetActive(false);

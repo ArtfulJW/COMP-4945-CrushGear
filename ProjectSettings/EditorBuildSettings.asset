@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/RaceTrackGates.unity
     guid: f3ad576f8d4d76347943333b4441183a
+  - enabled: 1
+    path: Assets/Scenes/Start.unity
+    guid: 4743f1cc96d7d3b41a9948a03ef39386
+  - enabled: 1
+    path: Assets/Scenes/NetworkTrackGen.unity
+    guid: 4cbee5f4de44b94428b84ba97b1df00d
   m_configObjects: {}
