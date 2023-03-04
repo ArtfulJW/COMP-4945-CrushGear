@@ -48,8 +48,8 @@ public class UIManager : MonoBehaviour
             // this allows the UnityMultiplayer and UnityMultiplayerRelay scene to work with and without
             // relay features - if the Unity transport is found and is relay protocol then we redirect all the 
             // traffic through the relay, else it just uses a LAN type (UNET) communication.
-            //if (RelayManager.Instance.IsRelayEnabled)
-            //    await RelayManager.Instance.SetupRelay();
+            if (RelayManager.Instance.IsRelayEnabled)
+                await RelayManager.Instance.SetupRelay();
 
             if (NetworkManager.Singleton.StartHost())
             {
@@ -65,8 +65,8 @@ public class UIManager : MonoBehaviour
 
         // START CLIENT
         startClientButton?.onClick.AddListener(async () => {
-            //if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(joinCodeInput.text))
-            //    await RelayManager.Instance.JoinRelay(joinCodeInput.text);
+            if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(joinCodeInput.text))
+                await RelayManager.Instance.JoinRelay(joinCodeInput.text);
 
             if (NetworkManager.Singleton.StartClient())
             {
@@ -101,6 +101,7 @@ public class UIManager : MonoBehaviour
     {
         startHostButton.gameObject.SetActive(false);
         startClientButton.gameObject.SetActive(false);
+        joinCodeInput.gameObject.SetActive(false);
         playersInGameText.gameObject.SetActive(true);
         timerPanel.SetActive(true);
     }
