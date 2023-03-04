@@ -1,16 +1,48 @@
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
-public class GenerateRoad : MonoBehaviour
+public class GenerateRoad : NetworkBehaviour
 {
-    
+
+    struct GeneratedPointsStruct : INetworkSerializable
+    {
+        public Vector3[] points;
+
+        // INetworkSerializable
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            // Length
+            int length = 0;
+            if (!serializer.IsReader)
+            {
+                length = points.Length;
+            }
+
+            serializer.SerializeValue(ref length);
+
+            // Array
+            if (serializer.IsReader)
+            {
+                points = new Vector3[length];
+            }
+
+            for (int n = 0; n < length; ++n)
+            {
+                serializer.SerializeValue(ref points[n]);
+            }
+        }
+        // ~INetworkSerializable
+    }
+
     public GameObject MeshObject;
 
     [SerializeField]
@@ -22,10 +54,13 @@ public class GenerateRoad : MonoBehaviour
     [SerializeField]
     private GameObject Gate;
 
+    [SerializeField]
+    private bool trackExists = false;
+
     // Reference to another Script (TrackInfo.cs)
     private TrackInfo TrackManager;
 
-    private Vector3[] GeneratedPoints;
+    private NetworkVariable<GeneratedPointsStruct> GeneratedPoints = new NetworkVariable<GeneratedPointsStruct>();
     public List<Vector3> convexHull;
 
     private void Awake()
@@ -33,22 +68,34 @@ public class GenerateRoad : MonoBehaviour
         MeshObject = GameObject.Find("MeshBounds");
 
         TrackManager = GameObject.Find("TrackManager").GetComponent<TrackInfo>();
+    }
 
-        // Generate Points given the 2D Plane's bounds
-        GeneratedPoints = GeneratePoints(12, MeshObject);
+    // Was start method
+    public void InitializeTrack()
+    {
 
-        // Remove Duplicates!
-        convexHull = GenerateConvexHull(GeneratedPoints).Distinct().ToList();
-        
-        UnityEngine.Debug.Log("Length: " + convexHull.Count);
+        if (!IsOwner)
+        {
+            RequestPointsServerRPC();
+            return;
+        }
+
+        // if (GeneratedPoints.Value.points != null) generateTrack();
+        Debug.Log("Generating points");
+        Vector3[] points = GeneratePoints(12, MeshObject);
+        GeneratePointsServerRPC(points);
 
     }
 
-    // Start is called before the first frame update
-    void Start()
+    void generateTrack()
     {
+        // Remove Duplicates!
+        Debug.Log("Generating track");
+        convexHull = GenerateConvexHull(GeneratedPoints.Value.points).Distinct().ToList();
 
-        TrackManager.goal = Instantiate(Goal, convexHull.First(), Quaternion.identity); 
+        UnityEngine.Debug.Log("Length: " + convexHull.Count);
+
+        TrackManager.goal = Instantiate(Goal, convexHull.First(), Quaternion.identity);
 
         double y = 0;
         while (y < 1)
@@ -72,19 +119,14 @@ public class GenerateRoad : MonoBehaviour
 
             y += .01;
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        trackExists = true;
     }
 
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying) return;
-        
-        foreach(Vector3 point in GeneratedPoints)
+
+        foreach (Vector3 point in GeneratedPoints.Value.points)
         {
             Gizmos.color = UnityEngine.Color.blue;
             Gizmos.DrawCube(point, new Vector3((float)0.25, (float)0.25, (float)0.25));
@@ -99,7 +141,7 @@ public class GenerateRoad : MonoBehaviour
         for (int x = 0; x < convexHull.Count(); x++)
         {
             Gizmos.color = UnityEngine.Color.green;
-            if (x < convexHull.Count-1)
+            if (x < convexHull.Count - 1)
             {
                 Gizmos.DrawLine(convexHull[x], convexHull[x + 1]);
             }
@@ -114,14 +156,15 @@ public class GenerateRoad : MonoBehaviour
         double y = 0;
         while (y < 1)
         {
-            
+
             for (int x = 0; x < convexHull.Count; x++)
             {
-                
+
                 if (convexHull[x] != convexHull.Last())
                 {
                     Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
-                } else
+                }
+                else
                 {
                     Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
                 }
@@ -130,6 +173,31 @@ public class GenerateRoad : MonoBehaviour
             y += .05;
         }
 
+    }
+
+    [ServerRpc]
+    public void GeneratePointsServerRPC(Vector3[] points)
+    {
+        Debug.Log("Server points");
+        // Generate Points given the 2D Plane's bounds
+        GeneratedPoints.Value = new GeneratedPointsStruct { points = points };
+        SetPointsClientRPC(points);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestPointsServerRPC()
+    {
+        Debug.Log("Request points");
+        SetPointsClientRPC(GeneratedPoints.Value.points);
+    }
+
+    [ClientRpc]
+    public void SetPointsClientRPC(Vector3[] points)
+    {
+        Debug.Log("Client points");
+        // Generate Points given the 2D Plane's bounds
+        GeneratedPoints.Value = new GeneratedPointsStruct { points = points };
+        if(!trackExists) generateTrack();
     }
 
 
@@ -167,7 +235,7 @@ public class GenerateRoad : MonoBehaviour
     /// <param name="targetPoint"></param>
     /// <param name="checkedPoint"></param>
     /// <returns></returns>
-    float CalculateCrossProduct(Vector3 currentPoint, Vector3 targetPoint, Vector3 checkedPoint) 
+    float CalculateCrossProduct(Vector3 currentPoint, Vector3 targetPoint, Vector3 checkedPoint)
     {
         /*
          * Return Values:
@@ -196,7 +264,8 @@ public class GenerateRoad : MonoBehaviour
         Vector3 leftmostPoint = generatedPoints[0];
 
         // Look for the left most point to start from
-        foreach (Vector3 p in generatedPoints) {
+        foreach (Vector3 p in generatedPoints)
+        {
             // Checking to see if there's a vertex that is left of "leftmostPoint"
             if (leftmostPoint.x > p.x)
             {
@@ -249,12 +318,12 @@ public class GenerateRoad : MonoBehaviour
 
     }
 
-    Vector3 Render4PTBezier(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float time) 
+    Vector3 Render4PTBezier(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float time)
     {
         // Linearly interpolate between all the points
-        Vector3 v1 = Vector3.Lerp(p0,p1,time);
-        Vector3 v2 = Vector3.Lerp(p1,p2,time);
-        Vector3 v3 = Vector3.Lerp(p2,p3,time);
+        Vector3 v1 = Vector3.Lerp(p0, p1, time);
+        Vector3 v2 = Vector3.Lerp(p1, p2, time);
+        Vector3 v3 = Vector3.Lerp(p2, p3, time);
 
         // Linerly interpolate between these three points
         Vector3 v4 = Vector3.Lerp(v1, v2, time);

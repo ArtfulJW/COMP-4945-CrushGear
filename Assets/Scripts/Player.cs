@@ -41,15 +41,18 @@ public class Player : NetworkBehaviour
             {
                 other.gameObject.SetActive(false);
                 triggerCounter++;
+                UpdateClientServerRpc(triggerCounter, lapCounter);
+                processTrigger();
             }
             else if (other.tag == "Goal")
             {
                 other.gameObject.SetActive(false);
                 lapCounter++;
                 triggerCounter = 0;
+                UpdateClientServerRpc(triggerCounter, lapCounter);
+                processTrigger();
             }
-            UpdateClientServerRpc(triggerCounter, lapCounter);
-            processTrigger();
+            
         }
 
     }

@@ -631,7 +631,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ProtocolType: 0
+  m_ProtocolType: 1
   m_MaxPacketQueueSize: 128
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
@@ -1361,9 +1361,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 446581287793434754, guid: f17d974f4adb47949828c57f835b8ef0, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1435580373559558336, guid: f17d974f4adb47949828c57f835b8ef0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2261847933802046618, guid: f17d974f4adb47949828c57f835b8ef0, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2174653962
+      objectReference: {fileID: 0}
     - target: {fileID: 2391566113595896340, guid: f17d974f4adb47949828c57f835b8ef0, type: 3}
       propertyPath: m_Name
       value: TrackGenerator
+      objectReference: {fileID: 0}
+    - target: {fileID: 2391566113595896340, guid: f17d974f4adb47949828c57f835b8ef0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5284775468356594029, guid: f17d974f4adb47949828c57f835b8ef0, type: 3}
       propertyPath: m_RootOrder
@@ -1662,7 +1678,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 40
+  field of view: 90
   orthographic: 0
   orthographic size: 10
   m_Depth: 0
@@ -1687,8 +1703,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1096297290}
-  m_LocalRotation: {x: -0.63466907, y: 0, z: 0, w: -0.77278405}
-  m_LocalPosition: {x: -0.16, y: 25.963951, z: -13.305464}
+  m_LocalRotation: {x: 0.12137763, y: 0, z: 0, w: 0.99260646}
+  m_LocalPosition: {x: 0, y: 2.5, z: -7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

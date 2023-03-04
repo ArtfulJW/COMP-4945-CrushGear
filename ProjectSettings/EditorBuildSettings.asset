@@ -14,10 +14,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/RaceTestTrack.unity
     guid: a0102427d306c5c48b6257a061d991bc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/RaceTrackGates.unity
     guid: f3ad576f8d4d76347943333b4441183a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Start.unity
     guid: 4743f1cc96d7d3b41a9948a03ef39386
   - enabled: 1

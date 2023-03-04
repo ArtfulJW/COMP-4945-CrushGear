@@ -38,9 +38,14 @@ public class UIManager : MonoBehaviour
         // START SERVER
         startServerButton?.onClick.AddListener(() => {
             if (NetworkManager.Singleton.StartServer())
+            {
                 Debug.Log("Server started...");
+                enableRaceScene();
+            }
             else
+            {
                 Debug.Log("Unable to start server...");
+            }
         });
 
         // START HOST
@@ -54,6 +59,7 @@ public class UIManager : MonoBehaviour
             if (NetworkManager.Singleton.StartHost())
             {
                 Debug.Log("Host started...");
+                enableRaceScene();
                 activateRacingUI();
             }
             else
@@ -71,6 +77,7 @@ public class UIManager : MonoBehaviour
             if (NetworkManager.Singleton.StartClient())
             {
                 Debug.Log("Client started...");
+                enableRaceScene();
                 activateRacingUI();
             }
             else
@@ -99,11 +106,16 @@ public class UIManager : MonoBehaviour
 
     void activateRacingUI()
     {
-        //Switch scenes to game from lobby scene
         startHostButton?.gameObject.SetActive(false);
         startClientButton?.gameObject.SetActive(false);
         joinCodeInput?.gameObject.SetActive(false);
         playersInGameText?.gameObject.SetActive(true);
         timerPanel?.SetActive(true);
+    }
+
+    void enableRaceScene()
+    {
+        //Switch scenes to game from lobby scene
+        GameObject.Find("TrackManager").GetComponent<GenerateRoad>().InitializeTrack();
     }
 }
