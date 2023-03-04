@@ -99,10 +99,10 @@ public class UIManager : MonoBehaviour
 
     void activateRacingUI()
     {
-        startHostButton.gameObject.SetActive(false);
-        startClientButton.gameObject.SetActive(false);
-        joinCodeInput.gameObject.SetActive(false);
-        playersInGameText.gameObject.SetActive(true);
-        timerPanel.SetActive(true);
+        startHostButton?.gameObject.SetActive(false);
+        startClientButton?.gameObject.SetActive(false);
+        joinCodeInput?.gameObject.SetActive(false);
+        playersInGameText?.gameObject.SetActive(true);
+        timerPanel?.SetActive(true);
     }
 }
