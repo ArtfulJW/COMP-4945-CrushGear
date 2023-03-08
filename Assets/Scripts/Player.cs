@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Collections;
 using TMPro;
 
 public class Player : NetworkBehaviour
@@ -63,18 +62,18 @@ public class Player : NetworkBehaviour
 
     }
 
-    public override void OnNetworkSpawn()
+    public void SetSpawnPosition()
     {
 
         //Transform[] t = GetComponentsInChildren<Transform>();
-        //UnityEngine.Debug.Log(GameObject.Find("TrackManager").GetComponent<GenerateRoad>().convexHull[0]);
-        //UnityEngine.Debug.Log("HELL: "+ transform.parent.position + " " + transform.parent.name);
+        UnityEngine.Debug.Log(GameObject.Find("TrackManager").GetComponent<GenerateRoad>().convexHull[0]);
+        UnityEngine.Debug.Log("HELL: " + transform.parent.position + " " + transform.parent.name);
 
-        // This for loop works.
-        //foreach(Transform t in transform)
-        //{
-        //    t.position += GameObject.Find("TrackManager").GetComponent<GenerateRoad>().convexHull[0];
-        //}
+        //This for loop works.
+        foreach (Transform t in transform)
+        {
+            t.position += GameObject.Find("TrackManager").GetComponent<GenerateRoad>().convexHull[0];
+        }
 
         // This one doesnt work
         //transform.GetComponent<Rigidbody>().position = GameObject.Find("TrackManager").GetComponent<GenerateRoad>().convexHull[0];

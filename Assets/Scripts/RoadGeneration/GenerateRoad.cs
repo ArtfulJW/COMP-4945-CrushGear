@@ -6,8 +6,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 
 public class GenerateRoad : NetworkBehaviour

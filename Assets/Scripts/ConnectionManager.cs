@@ -73,6 +73,7 @@ public class ConnectionManager : MonoBehaviour
 
     private void OnServerStartedCallback()
     {
+        Debug.Log("Server started");
         GameObject.Find("TrackManager").GetComponent<GenerateRoad>().InitializeTrack();
     }
 

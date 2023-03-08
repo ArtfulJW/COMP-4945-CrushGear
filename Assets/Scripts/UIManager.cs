@@ -44,7 +44,7 @@ public class UIManager : MonoBehaviour
             if (NetworkManager.Singleton.StartServer())
             {
                 Debug.Log("Server started...");
-                enableRaceScene();
+                //enableRaceScene();
             }
             else
             {
@@ -92,10 +92,10 @@ public class UIManager : MonoBehaviour
         });
 
         // STATUS TYPE CALLBACKS
-        NetworkManager.Singleton.OnClientConnectedCallback += (id) => {
-            Debug.Log($"{id} just connected...");
-            //enableRaceScene();
-        };
+        //NetworkManager.Singleton.OnClientConnectedCallback += (id) => {
+        //    Debug.Log($"{id} just connected...");
+        //    //enableRaceScene();
+        //};
 
         NetworkManager.Singleton.OnServerStarted += () => {
             hasServerStarted = true;
@@ -120,9 +120,9 @@ public class UIManager : MonoBehaviour
         roomCode?.gameObject.SetActive(true);
     }
 
-    void enableRaceScene()
-    {
-        //Switch scenes to game from lobby scene
-        GameObject.Find("TrackManager").GetComponent<GenerateRoad>().InitializeTrack();
-    }
+    //void enableRaceScene()
+    //{
+    //    //Switch scenes to game from lobby scene
+    //    GameObject.Find("TrackManager").GetComponent<GenerateRoad>().InitializeTrack();
+    //}
 }
