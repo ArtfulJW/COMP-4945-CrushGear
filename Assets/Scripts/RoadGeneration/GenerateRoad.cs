@@ -74,8 +74,9 @@ public class GenerateRoad : NetworkBehaviour
     public void InitializeTrack()
     {
 
-        if (!IsOwner)
+        if (!IsHost)
         {
+            Debug.Log("Requesting");
             RequestPointsServerRPC();
             return;
         }
@@ -181,22 +182,21 @@ public class GenerateRoad : NetworkBehaviour
         Debug.Log("Server points");
         // Generate Points given the 2D Plane's bounds
         GeneratedPoints.Value = new GeneratedPointsStruct { points = points };
-        SetPointsClientRPC(points);
+        SetPointsClientRPC();
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void RequestPointsServerRPC()
     {
         Debug.Log("Request points");
-        SetPointsClientRPC(GeneratedPoints.Value.points);
+        SetPointsClientRPC();
     }
 
     [ClientRpc]
-    public void SetPointsClientRPC(Vector3[] points)
+    public void SetPointsClientRPC()
     {
         Debug.Log("Client points");
         // Generate Points given the 2D Plane's bounds
-        GeneratedPoints.Value = new GeneratedPointsStruct { points = points };
         if(!trackExists) generateTrack();
     }
 

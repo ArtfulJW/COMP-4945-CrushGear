@@ -20,10 +20,14 @@ public class UIManager : MonoBehaviour
     private TMP_InputField joinCodeInput;
 
     [SerializeField]
+    private GameObject timerPanel;
+
+    [SerializeField]
     private TextMeshProUGUI playersInGameText;
 
     [SerializeField]
-    private GameObject timerPanel;
+    private TextMeshProUGUI roomCode;
+
 
     private bool hasServerStarted;
 
@@ -59,8 +63,8 @@ public class UIManager : MonoBehaviour
             if (NetworkManager.Singleton.StartHost())
             {
                 Debug.Log("Host started...");
-                enableRaceScene();
                 activateRacingUI();
+                //enableRaceScene();
             }
             else
             {
@@ -77,8 +81,8 @@ public class UIManager : MonoBehaviour
             if (NetworkManager.Singleton.StartClient())
             {
                 Debug.Log("Client started...");
-                enableRaceScene();
                 activateRacingUI();
+                
             }
             else
             {
@@ -90,6 +94,7 @@ public class UIManager : MonoBehaviour
         // STATUS TYPE CALLBACKS
         NetworkManager.Singleton.OnClientConnectedCallback += (id) => {
             Debug.Log($"{id} just connected...");
+            enableRaceScene();
         };
 
         NetworkManager.Singleton.OnServerStarted += () => {
@@ -102,6 +107,7 @@ public class UIManager : MonoBehaviour
     void Update()
     {
         playersInGameText.text = $"Players in game: {PlayersManager.Instance.PlayersInGame}";
+        roomCode.text = $"Code: {RelayManager.Instance.GetRoomCode()}";
     }
 
     void activateRacingUI()
@@ -109,8 +115,9 @@ public class UIManager : MonoBehaviour
         startHostButton?.gameObject.SetActive(false);
         startClientButton?.gameObject.SetActive(false);
         joinCodeInput?.gameObject.SetActive(false);
-        playersInGameText?.gameObject.SetActive(true);
         timerPanel?.SetActive(true);
+        playersInGameText?.gameObject.SetActive(true);
+        roomCode?.gameObject.SetActive(true);
     }
 
     void enableRaceScene()
