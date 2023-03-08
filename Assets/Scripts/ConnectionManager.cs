@@ -56,7 +56,7 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Singleton.OnServerStarted += OnServerStartedCallback;
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
-        
+
     }
 
     private void OnDestroy()
@@ -80,14 +80,15 @@ public class ConnectionManager : MonoBehaviour
     {
         OnClientConnectionNotification?.Invoke(clientId, ConnectionStatus.Connected);
         Debug.Log($"{clientId} just connected...");
+
         if (NetworkManager.Singleton.IsServer)
         {
             SpawnPlayerServerRpc(clientId);
         }
-        //else
-        //{
-        //    SpawnPlayerServerRpc(clientId);
-        //}
+        else
+        {
+            GameObject.Find("TrackManager").GetComponent<GenerateRoad>().GenerateClientTrack();
+        }
     }
 
     private void OnClientDisconnectCallback(ulong clientId)
