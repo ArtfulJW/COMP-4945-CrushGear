@@ -192,7 +192,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 74807252}
-  m_LocalRotation: {x: 0.07274983, y: -0.000000019186341, z: 0.0000000013995114, w: 0.9973502}
+  m_LocalRotation: {x: 0.07274983, y: 0.000000019186345, z: -0.0000000013995116, w: 0.9973502}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -668,6 +668,21 @@ MonoBehaviour:
     NetworkPrefabs:
     - Override: 0
       Prefab: {fileID: 1661611690928583413, guid: 9bdf036d6f291094d9e32e46df84a624, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 5999765645159899866, guid: 85fc3e9f58d10f64295a19e3c1bf5721, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 5285070014480002306, guid: 7463bf989ed7e0b4b9aca23df0a1e2fc, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 7314615466503336674, guid: 23a119a2a244b324eaad4b5fbae1dbcf, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
@@ -1602,7 +1617,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 863227953}
-  m_LocalRotation: {x: 0.17067231, y: -0.000000016953926, z: 0.0000000029366534, w: 0.98532784}
+  m_LocalRotation: {x: 0.17067231, y: 0.000000016953926, z: -0.0000000029366534, w: 0.98532784}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

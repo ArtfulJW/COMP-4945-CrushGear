@@ -74,17 +74,19 @@ public class GenerateRoad : NetworkBehaviour
     public void InitializeTrack()
     {
 
-        if (!IsHost)
-        {
-            Debug.Log("Requesting");
-            RequestPointsServerRPC();
-            return;
-        }
+        //if (!IsHost)
+        //{
+        //    Debug.Log("Requesting");
+        //    RequestPointsServerRPC();
+        //    return;
+        //}
 
-        // if (GeneratedPoints.Value.points != null) generateTrack();
+        //// if (GeneratedPoints.Value.points != null) generateTrack();
         Debug.Log("Generating points");
         Vector3[] points = GeneratePoints(12, MeshObject);
-        GeneratePointsServerRPC(points);
+        GeneratedPoints.Value = new GeneratedPointsStruct { points = points };
+        generateTrack();
+        //GeneratePointsServerRPC(points);
 
     }
 
@@ -97,6 +99,7 @@ public class GenerateRoad : NetworkBehaviour
         Debug.Log("Length: " + convexHull.Count);
 
         TrackManager.goal = Instantiate(Goal, convexHull.First(), Quaternion.identity);
+        TrackManager.goal.GetComponent<NetworkObject>().Spawn();
 
         double y = 0;
         while (y < 1)
@@ -106,14 +109,23 @@ public class GenerateRoad : NetworkBehaviour
 
                 if (convexHull[x] != convexHull.Last())
                 {
-                    Instantiate(RoadMesh, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity);
-                    TrackManager.triggers.Add(Instantiate(Gate, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity));
+                    GameObject mesh = Instantiate(RoadMesh, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity);
+                    mesh.GetComponent<NetworkObject>().Spawn();
+
+                    GameObject trigger = Instantiate(Gate, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity);
+                    TrackManager.triggers.Add(trigger);
+                    trigger.GetComponent<NetworkObject>().Spawn();
                     //Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
                 }
                 else
                 {
-                    Instantiate(RoadMesh, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity);
-                    TrackManager.triggers.Add(Instantiate(Gate, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity));
+                    GameObject mesh = Instantiate(RoadMesh, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity);
+                    mesh.GetComponent<NetworkObject>().Spawn();
+
+                    GameObject trigger = Instantiate(Gate, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity);
+                    TrackManager.triggers.Add(trigger);
+                    trigger.GetComponent<NetworkObject>().Spawn();
+
                     //Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
                 }
             }

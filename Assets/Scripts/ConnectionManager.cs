@@ -53,8 +53,10 @@ public class ConnectionManager : MonoBehaviour
                 $"Please add a {nameof(NetworkManager)} to the scene.");
         }
 
+        NetworkManager.Singleton.OnServerStarted += OnServerStartedCallback;
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
+        
     }
 
     private void OnDestroy()
@@ -63,16 +65,21 @@ public class ConnectionManager : MonoBehaviour
         // remove the subscriptions if that singleton still exists.
         if (NetworkManager.Singleton != null)
         {
+            NetworkManager.Singleton.OnServerStarted -= OnServerStartedCallback;
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
         }
+    }
+
+    private void OnServerStartedCallback()
+    {
+        GameObject.Find("TrackManager").GetComponent<GenerateRoad>().InitializeTrack();
     }
 
     private void OnClientConnectedCallback(ulong clientId)
     {
         OnClientConnectionNotification?.Invoke(clientId, ConnectionStatus.Connected);
         Debug.Log($"{clientId} just connected...");
-        GameObject.Find("TrackManager").GetComponent<GenerateRoad>().InitializeTrack();
         if (NetworkManager.Singleton.IsServer)
         {
             SpawnPlayerServerRpc(clientId);
