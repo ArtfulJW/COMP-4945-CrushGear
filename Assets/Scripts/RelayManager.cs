@@ -61,7 +61,8 @@ public class RelayManager : Singleton<RelayManager>
 
     public async Task<RelayJoinData> JoinRelay(string joinCode)
     {
-        Debug.Log($"Client Joining Game With Join Code: {joinCode}");
+        roomCode = joinCode.ToUpper();
+        Debug.Log($"Client Joining Game With Join Code: {roomCode}");
 
         InitializationOptions options = new InitializationOptions()
             .SetEnvironmentName(environment);
@@ -73,7 +74,7 @@ public class RelayManager : Singleton<RelayManager>
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
 
-        JoinAllocation allocation = await Relay.Instance.JoinAllocationAsync(joinCode);
+        JoinAllocation allocation = await Relay.Instance.JoinAllocationAsync(roomCode);
 
         RelayJoinData relayJoinData = new RelayJoinData
         {
@@ -84,15 +85,13 @@ public class RelayManager : Singleton<RelayManager>
             ConnectionData = allocation.ConnectionData,
             HostConnectionData = allocation.HostConnectionData,
             IPv4Address = allocation.RelayServer.IpV4,
-            JoinCode = joinCode
+            JoinCode = roomCode
         };
-
-        roomCode = joinCode;
 
         Transport.SetRelayServerData(relayJoinData.IPv4Address, relayJoinData.Port, relayJoinData.AllocationIDBytes,
             relayJoinData.Key, relayJoinData.ConnectionData, relayJoinData.HostConnectionData);
 
-        Debug.Log($"Client Joined Game With Join Code: {joinCode}");
+        Debug.Log($"Client Joined Game With Join Code: {roomCode}");
 
         return relayJoinData;
     }

@@ -94,7 +94,7 @@ public class UIManager : MonoBehaviour
         // STATUS TYPE CALLBACKS
         NetworkManager.Singleton.OnClientConnectedCallback += (id) => {
             Debug.Log($"{id} just connected...");
-            enableRaceScene();
+            //enableRaceScene();
         };
 
         NetworkManager.Singleton.OnServerStarted += () => {

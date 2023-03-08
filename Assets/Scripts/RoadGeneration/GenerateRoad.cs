@@ -94,7 +94,7 @@ public class GenerateRoad : NetworkBehaviour
         Debug.Log("Generating track");
         convexHull = GenerateConvexHull(GeneratedPoints.Value.points).Distinct().ToList();
 
-        UnityEngine.Debug.Log("Length: " + convexHull.Count);
+        Debug.Log("Length: " + convexHull.Count);
 
         TrackManager.goal = Instantiate(Goal, convexHull.First(), Quaternion.identity);
 

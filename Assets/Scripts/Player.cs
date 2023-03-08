@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Collections;
+using TMPro;
 
 public class Player : NetworkBehaviour
 {
@@ -21,11 +22,16 @@ public class Player : NetworkBehaviour
     [SerializeField]
     private NetworkVariable<int> networkLapCounter = new NetworkVariable<int>();
 
+    [SerializeField]
+    private NetworkVariable<NetworkString> playerNetworkName = new NetworkVariable<NetworkString>();
+
+
     private void Start()
     {
         // Init track info
         trackInfo = GameObject.Find("TrackManager").GetComponent<TrackInfo>();
         triggerAmount = trackInfo.triggers.Count;
+        setOverlay();
     }
 
     /// <summary>
@@ -52,7 +58,7 @@ public class Player : NetworkBehaviour
                 UpdateClientServerRpc(triggerCounter, lapCounter);
                 processTrigger();
             }
-            
+
         }
 
     }
@@ -61,7 +67,6 @@ public class Player : NetworkBehaviour
     {
 
         //Transform[] t = GetComponentsInChildren<Transform>();
-        base.OnNetworkSpawn();
         //UnityEngine.Debug.Log(GameObject.Find("TrackManager").GetComponent<GenerateRoad>().convexHull[0]);
         //UnityEngine.Debug.Log("HELL: "+ transform.parent.position + " " + transform.parent.name);
 
@@ -105,6 +110,18 @@ public class Player : NetworkBehaviour
             Debug.Log("Activate Goal");
             trackInfo.goal.transform.Find("GoalTrigger").gameObject.SetActive(true);
         }
-            
+
+    }
+
+    void setOverlay()
+    {
+        Debug.Log("Setting Player name");
+        var localPlayerOverlay = gameObject.GetComponentInChildren<TextMeshProUGUI>();
+        localPlayerOverlay.text = $"{playerNetworkName.Value}";
+    }
+
+    public void SetPlayerID(ulong clientId)
+    {
+        playerNetworkName.Value = $"Player {clientId}";
     }
 }
