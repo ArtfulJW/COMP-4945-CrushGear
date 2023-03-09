@@ -103,45 +103,53 @@ public class GenerateRoad : NetworkBehaviour
 
         TrackManager.goal = Instantiate(Goal, convexHull.First(), Quaternion.identity);
 
-        double y = 0;
-        while (y < 1)
+        for (int x = 0; x < convexHull.Count; x++)
         {
-            for (int x = 0; x < convexHull.Count; x++)
-            {
+            generateTrackSection(x);
 
-                if (convexHull[x] != convexHull.Last())
-                {
-                    Instantiate(RoadMesh, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity);
-                    TrackManager.triggers.Add(Instantiate(Gate, Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), Quaternion.identity));
-                    //Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
-                }
-                else
-                {
-                    Instantiate(RoadMesh, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity);
-                    TrackManager.triggers.Add(Instantiate(Gate, Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), Quaternion.identity));
-                    //Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
-                }
-            }
 
-            y += 0.1;
         }
         trackExists = true;
     }
 
+    void generateTrackSection(int x)
+    {
+        Vector3 a = convexHull[x], b;
+        b = (a != convexHull.Last()) ? convexHull[x + 1] : convexHull.First();
+
+        double y = 0.1;
+        while (y < 0.9)
+        {
+            generateTrackNode(a, b, (float) y);
+            y += 0.1;
+        }
+    }
+
+    void generateTrackNode(Vector3 a, Vector3 b, float t)
+    {
+        Vector3 lerp = Vector3.Lerp(a, b, t);
+        // Determine rotation
+        float rad = MathF.Atan2(-b.z - -a.z, b.x - a.x) + (MathF.PI / 2.0f);
+        Quaternion rot = new Quaternion(0.0f, (MathF.Sin(rad / 2.0f)) * 1, 0.0f,  MathF.Cos(rad / 2.0f));
+        Instantiate(RoadMesh, lerp, rot);
+        TrackManager.triggers.Add(Instantiate(Gate, lerp, rot));
+    }
+
     private void OnDrawGizmos()
     {
-        if (!Application.isPlaying) return;
+        if (!Application.isPlaying)
+            return;
 
         foreach (Vector3 point in GeneratedPoints.Value.points)
         {
             Gizmos.color = UnityEngine.Color.blue;
-            Gizmos.DrawCube(point, new Vector3((float)0.25, (float)0.25, (float)0.25));
+            Gizmos.DrawCube(point, new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
         }
 
         foreach (Vector3 p in convexHull)
         {
             Gizmos.color = UnityEngine.Color.red;
-            Gizmos.DrawCube(p, new Vector3((float)0.35, (float)0.35, (float)0.35));
+            Gizmos.DrawCube(p, new Vector3((float) 0.35, (float) 0.35, (float) 0.35));
         }
 
         for (int x = 0; x < convexHull.Count(); x++)
@@ -168,11 +176,11 @@ public class GenerateRoad : NetworkBehaviour
 
                 if (convexHull[x] != convexHull.Last())
                 {
-                    Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+                    Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
                 }
                 else
                 {
-                    Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+                    Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
                 }
             }
 
@@ -202,7 +210,8 @@ public class GenerateRoad : NetworkBehaviour
     {
         Debug.Log("Client points");
         // Generate Points given the 2D Plane's bounds
-        if(!trackExists) generateTrack();
+        if (!trackExists)
+            generateTrack();
     }
 
 
@@ -356,17 +365,17 @@ public class GenerateRoad : NetworkBehaviour
 
     void draw4PTCurve(int x, float y)
     {
-        Gizmos.DrawCube(Render4PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], convexHull[x + 3], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+        Gizmos.DrawCube(Render4PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], convexHull[x + 3], (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
     }
 
     void draw3PTCurve(int x, float y)
     {
-        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
     }
 
     void draw3PTLastCurve(int x, float y)
     {
-        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull.Last(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull.Last(), (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
     }
 
     float calcAngle(Vector3 previousVector, Vector3 nextVector)
