@@ -123,7 +123,7 @@ public class GenerateRoad : NetworkBehaviour
                 }
             }
 
-            y += .01;
+            y += 0.1;
         }
         trackExists = true;
     }
