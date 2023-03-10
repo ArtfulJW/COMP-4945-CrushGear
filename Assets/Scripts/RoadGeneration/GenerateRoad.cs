@@ -124,7 +124,8 @@ public class GenerateRoad : NetworkBehaviour
 
         Quaternion rot = calculateRotation(a, b);
         generateTrackNode(a, b, rot);
-        TrackManager.triggers.Add(Instantiate(Gate, Vector3.Lerp(a, b, 0.5f), rot));
+        GameObject gate = Instantiate(Gate, Vector3.Lerp(a, b, 0.5f), rot);
+        TrackManager.triggers.Add(gate.transform.Find("Trigger").gameObject);
     }
 
     void generateTrackNode(Vector3 a, Vector3 b, Quaternion rot)

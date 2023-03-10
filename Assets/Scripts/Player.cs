@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using TMPro;
+using System;
 
 public class Player : NetworkBehaviour
 {
@@ -14,6 +15,12 @@ public class Player : NetworkBehaviour
     private int triggerCounter = 0;
     [SerializeField]
     private int lapCounter = 0;
+
+    //TIMER
+    private bool isRunning;
+    [SerializeField]
+    private float elapsedSeconds;
+    private float bestTimeSeconds = float.MaxValue;
 
     [SerializeField]
     private NetworkVariable<int> networkTriggerCounter = new NetworkVariable<int>();
@@ -31,6 +38,13 @@ public class Player : NetworkBehaviour
         trackInfo = GameObject.Find("TrackManager").GetComponent<TrackInfo>();
         triggerAmount = trackInfo.triggers.Count;
         setOverlay();
+    }
+
+    private void Update()
+    {
+        if (!isRunning) return;
+        elapsedSeconds += Time.deltaTime;
+        UIManager.Instance.SetElapsedTime(elapsedSeconds);
     }
 
     /// <summary>
@@ -56,6 +70,7 @@ public class Player : NetworkBehaviour
                 triggerCounter = 0;
                 UpdateClientServerRpc(triggerCounter, lapCounter);
                 processTrigger();
+                resetTimer();
             }
 
         }
@@ -92,6 +107,21 @@ public class Player : NetworkBehaviour
     {
         networkTriggerCounter.Value = triggerCount;
         networkLapCounter.Value = lapCount;
+    }
+
+    void resetTimer()
+    {
+        if (!isRunning)
+        {
+            isRunning = true;
+            return;
+        }
+        if (bestTimeSeconds > elapsedSeconds)
+        {
+            bestTimeSeconds = elapsedSeconds;
+            UIManager.Instance.SetBestTime(bestTimeSeconds);
+        }
+        elapsedSeconds = 0;
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -5,7 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Singleton<UIManager>
 {
     [SerializeField]
     private Button startServerButton;
@@ -120,9 +121,18 @@ public class UIManager : MonoBehaviour
         roomCode?.gameObject.SetActive(true);
     }
 
-    //void enableRaceScene()
-    //{
-    //    //Switch scenes to game from lobby scene
-    //    GameObject.Find("TrackManager").GetComponent<GenerateRoad>().InitializeTrack();
-    //}
+    public void SetElapsedTime(float elapsedSeconds)
+    {
+        var timeSpan = TimeSpan.FromSeconds(elapsedSeconds);
+        timerPanel.transform.Find("MinDisplay").GetComponent<TextMeshProUGUI>().text = string.Format("{0:D2}:", timeSpan.Minutes);
+        timerPanel.transform.Find("SecDisplay").GetComponent<TextMeshProUGUI>().text = string.Format("{0:D2}:", timeSpan.Seconds);
+        timerPanel.transform.Find("MiliDisplay").GetComponent<TextMeshProUGUI>().text = string.Format("{0:D2}",timeSpan.Milliseconds);
+    }
+    public void SetBestTime(float bestTimeSeconds)
+    {
+        var timeSpan = TimeSpan.FromSeconds(bestTimeSeconds);
+        timerPanel.transform.Find("MinDisplayBest").GetComponent<TextMeshProUGUI>().text = string.Format("{0:D2}:", timeSpan.Minutes);
+        timerPanel.transform.Find("SecDisplayBest").GetComponent<TextMeshProUGUI>().text = string.Format("{0:D2}:", timeSpan.Seconds);
+        timerPanel.transform.Find("MiliDisplayBest").GetComponent<TextMeshProUGUI>().text = string.Format("{0:D2}", timeSpan.Milliseconds);
+    }
 }
