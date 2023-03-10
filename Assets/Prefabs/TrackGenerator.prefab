@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshObject: {fileID: 4994133631679908749}
   RoadMesh: {fileID: 5285070014480002306, guid: 7463bf989ed7e0b4b9aca23df0a1e2fc, type: 3}
+  RoadArrowMesh: {fileID: 5285070014480002306, guid: efd2e94f3f69abe42bd3ed4c7b981fc3, type: 3}
   Goal: {fileID: 5999765645159899866, guid: 85fc3e9f58d10f64295a19e3c1bf5721, type: 3}
   Gate: {fileID: 7314615466503336674, guid: 23a119a2a244b324eaad4b5fbae1dbcf, type: 3}
   trackExists: 0

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3677508786701591531}
   - component: {fileID: 1628737192150374390}
   m_Layer: 0
-  m_Name: RoadMesh
+  m_Name: RoadArrowMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

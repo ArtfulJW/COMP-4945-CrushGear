@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GenerateRoad : NetworkBehaviour
@@ -46,6 +47,8 @@ public class GenerateRoad : NetworkBehaviour
 
     [SerializeField]
     private GameObject RoadMesh;
+    [SerializeField]
+    private GameObject RoadArrowMesh;
 
     [SerializeField]
     private GameObject Goal;
@@ -126,17 +129,18 @@ public class GenerateRoad : NetworkBehaviour
 
     void generateTrackNode(Vector3 a, Vector3 b, Quaternion rot)
     {
-        for (float t = 0f; t < 1f; t += 0.05f)
+        Instantiate(RoadMesh, a, rot);
+        for (float t = 0.05f; t < 0.95f; t += 0.1f)
         {
             Vector3 lerp = Vector3.Lerp(a, b, t);
-            Instantiate(RoadMesh, lerp, rot);
+            Instantiate(RoadArrowMesh, lerp, rot);
         }
     }
 
     Quaternion calculateRotation(Vector3 a, Vector3 b)
     {
         // Determine rotation
-        float rad = MathF.Atan2(-b.z - -a.z, b.x - a.x) + (MathF.PI / 2.0f);
+        float rad = MathF.Atan2(-b.z - -a.z, b.x - a.x) - (MathF.PI / 2.0f);
         return new Quaternion(0.0f, (MathF.Sin(rad / 2.0f)) * 1, 0.0f, MathF.Cos(rad / 2.0f));
     }
 
