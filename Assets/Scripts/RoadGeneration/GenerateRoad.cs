@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.Netcode;
@@ -75,6 +76,10 @@ public class GenerateRoad : NetworkBehaviour
     {
         Debug.Log("Generating points");
         Vector3[] points = GeneratePoints(12, MeshObject);
+        while (GenerateConvexHull(points).Distinct().ToList().Count < 3)
+        {
+            points = GeneratePoints(12, MeshObject);
+        }
         GeneratedPoints.Value = new GeneratedPointsStruct { points = points };
         generateTrack();
     }
@@ -90,9 +95,14 @@ public class GenerateRoad : NetworkBehaviour
         Debug.Log("Generating track");
         convexHull = GenerateConvexHull(GeneratedPoints.Value.points).Distinct().ToList();
 
+        while(convexHull.Count < 3) {
+            Vector3[] points = GeneratePoints(12, MeshObject);
+            GeneratedPoints.Value = new GeneratedPointsStruct { points = points };
+            convexHull = GenerateConvexHull(GeneratedPoints.Value.points).Distinct().ToList();
+        }
         Debug.Log("Length: " + convexHull.Count);
 
-        Quaternion rot = calculateRotation(convexHull.First(), convexHull[1]);
+        Quaternion rot = calculateRotation(convexHull.Last(), convexHull[1]);
         TrackManager.goal = Instantiate(Goal, convexHull.First(), rot);
 
         for (int x = 0; x < convexHull.Count; x++)

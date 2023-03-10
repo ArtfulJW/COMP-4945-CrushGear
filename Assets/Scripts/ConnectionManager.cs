@@ -84,10 +84,11 @@ public class ConnectionManager : MonoBehaviour
 
         if (NetworkManager.Singleton.IsServer)
         {
-            SpawnPlayerServerRpc(clientId);
+            spawnPlayer(clientId);
         }
         else
         {
+            Debug.Log("Generating Client Track");
             GameObject.Find("TrackManager").GetComponent<GenerateRoad>().GenerateClientTrack();
         }
     }
@@ -105,12 +106,13 @@ public class ConnectionManager : MonoBehaviour
 
     private void spawnPlayer(ulong clientId)
     {
+        Debug.Log("Spawning Player");
         GameObject newPlayer;
         newPlayer = (GameObject)Instantiate(PlayerPrefab);
         NetworkObject netObj = newPlayer.GetComponent<NetworkObject>();
         newPlayer.SetActive(true);
         netObj.SpawnAsPlayerObject(clientId, true);
-        Player player = newPlayer.transform.Find("CarRoot").GetComponent<Player>();
+        Player player = newPlayer.GetComponent<Player>();
         player.SetPlayerID(clientId);
         //player.SetSpawnPosition();
     }
