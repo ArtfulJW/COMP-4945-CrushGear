@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1435580373559558336}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 32.906685, y: 1.3199695, z: -141.95523}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -50,6 +50,7 @@ MonoBehaviour:
   RoadMesh: {fileID: 5285070014480002306, guid: 7463bf989ed7e0b4b9aca23df0a1e2fc, type: 3}
   Goal: {fileID: 5999765645159899866, guid: 85fc3e9f58d10f64295a19e3c1bf5721, type: 3}
   Gate: {fileID: 7314615466503336674, guid: 23a119a2a244b324eaad4b5fbae1dbcf, type: 3}
+  trackExists: 0
   convexHull: []
 --- !u!114 &1435580373559558399
 MonoBehaviour:
@@ -105,7 +106,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2391566113595896340}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -29.589085, y: 0.000030517578, z: 129.14496}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -123,7 +124,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1575881563299120975, guid: 715c61b3d174c2741bb50db10aac7878, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6242708911193287744, guid: 715c61b3d174c2741bb50db10aac7878, type: 3}
       propertyPath: m_Name
@@ -147,15 +148,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9121686264978681167, guid: 715c61b3d174c2741bb50db10aac7878, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 29.059084
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9121686264978681167, guid: 715c61b3d174c2741bb50db10aac7878, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0019694567
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9121686264978681167, guid: 715c61b3d174c2741bb50db10aac7878, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -128.25496
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9121686264978681167, guid: 715c61b3d174c2741bb50db10aac7878, type: 3}
       propertyPath: m_LocalRotation.w

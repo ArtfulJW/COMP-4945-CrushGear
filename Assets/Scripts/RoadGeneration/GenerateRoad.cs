@@ -54,12 +54,14 @@ public class GenerateRoad : NetworkBehaviour
 
     [SerializeField]
     private bool trackExists = false;
+    
+    [SerializeField]
+    private List<Vector3> convexHull;
 
     // Reference to another Script (TrackInfo.cs)
     private TrackInfo TrackManager;
 
     private NetworkVariable<GeneratedPointsStruct> GeneratedPoints = new NetworkVariable<GeneratedPointsStruct>();
-    public List<Vector3> convexHull;
 
     private void Awake()
     {
@@ -71,21 +73,10 @@ public class GenerateRoad : NetworkBehaviour
     // Was start method
     public void InitializeTrack()
     {
-
-        //if (!IsHost)
-        //{
-        //    Debug.Log("Requesting");
-        //    RequestPointsServerRPC();
-        //    return;
-        //}
-
-        // if (GeneratedPoints.Value.points != null) generateTrack();
         Debug.Log("Generating points");
         Vector3[] points = GeneratePoints(12, MeshObject);
         GeneratedPoints.Value = new GeneratedPointsStruct { points = points };
         generateTrack();
-        //GeneratePointsServerRPC(points);
-
     }
 
     public void GenerateClientTrack()
@@ -101,92 +92,42 @@ public class GenerateRoad : NetworkBehaviour
 
         Debug.Log("Length: " + convexHull.Count);
 
-        TrackManager.goal = Instantiate(Goal, convexHull.First(), Quaternion.identity);
+        Quaternion rot = calculateRotation(convexHull.First(), convexHull[1]);
+        TrackManager.goal = Instantiate(Goal, convexHull.First(), rot);
 
         for (int x = 0; x < convexHull.Count; x++)
         {
             generateTrackSection(x);
-
-
         }
         trackExists = true;
     }
 
     void generateTrackSection(int x)
     {
-        Vector3 a = convexHull[x], b;
-        b = (a != convexHull.Last()) ? convexHull[x + 1] : convexHull.First();
+        Vector3 a, b;
+        //a = (convexHull[x] == convexHull.First()) ? convexHull.Last() : convexHull[x - 1];
+        a = convexHull[x];
+        b = (convexHull[x] == convexHull.Last()) ? convexHull.First() : convexHull[x + 1];
 
-        double y = 0.1;
-        while (y < 0.9)
+        Quaternion rot = calculateRotation(a, b);
+        generateTrackNode(a, b, rot);
+        TrackManager.triggers.Add(Instantiate(Gate, Vector3.Lerp(a, b, 0.5f), rot));
+    }
+
+    void generateTrackNode(Vector3 a, Vector3 b, Quaternion rot)
+    {
+        for (float t = 0f; t < 1f; t += 0.05f)
         {
-            generateTrackNode(a, b, (float) y);
-            y += 0.1;
+            Vector3 lerp = Vector3.Lerp(a, b, t);
+            Instantiate(RoadMesh, lerp, rot);
         }
     }
 
-    void generateTrackNode(Vector3 a, Vector3 b, float t)
+    Quaternion calculateRotation(Vector3 a, Vector3 b)
     {
-        Vector3 lerp = Vector3.Lerp(a, b, t);
         // Determine rotation
         float rad = MathF.Atan2(-b.z - -a.z, b.x - a.x) + (MathF.PI / 2.0f);
-        Quaternion rot = new Quaternion(0.0f, (MathF.Sin(rad / 2.0f)) * 1, 0.0f,  MathF.Cos(rad / 2.0f));
-        Instantiate(RoadMesh, lerp, rot);
-        TrackManager.triggers.Add(Instantiate(Gate, lerp, rot));
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (!Application.isPlaying)
-            return;
-
-        foreach (Vector3 point in GeneratedPoints.Value.points)
-        {
-            Gizmos.color = UnityEngine.Color.blue;
-            Gizmos.DrawCube(point, new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
-        }
-
-        foreach (Vector3 p in convexHull)
-        {
-            Gizmos.color = UnityEngine.Color.red;
-            Gizmos.DrawCube(p, new Vector3((float) 0.35, (float) 0.35, (float) 0.35));
-        }
-
-        for (int x = 0; x < convexHull.Count(); x++)
-        {
-            Gizmos.color = UnityEngine.Color.green;
-            if (x < convexHull.Count - 1)
-            {
-                Gizmos.DrawLine(convexHull[x], convexHull[x + 1]);
-            }
-            else
-            {
-                Gizmos.color = UnityEngine.Color.yellow;
-                Gizmos.DrawLine(convexHull[convexHull.Count - 1], convexHull[0]);
-            }
-        }
-
-        Gizmos.color = UnityEngine.Color.yellow;
-        double y = 0;
-        while (y < 1)
-        {
-
-            for (int x = 0; x < convexHull.Count; x++)
-            {
-
-                if (convexHull[x] != convexHull.Last())
-                {
-                    Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
-                }
-                else
-                {
-                    Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
-                }
-            }
-
-            y += .05;
-        }
-
+        return new Quaternion(0.0f, (MathF.Sin(rad / 2.0f)) * 1, 0.0f, MathF.Cos(rad / 2.0f));
     }
 
     [ServerRpc]
@@ -232,7 +173,7 @@ public class GenerateRoad : NetworkBehaviour
         for (int x = 0; x < numPoints; x++)
         {
             // Generate Point
-            pointList[x] = new Vector3(UnityEngine.Random.Range(minimum.x, maximum.x), 0, UnityEngine.Random.Range(minimum.z, maximum.z));
+            pointList[x] = new Vector3(UnityEngine.Random.Range(minimum.x, maximum.x), 0f, UnityEngine.Random.Range(minimum.z, maximum.z));
 
             // Modify to accomdate any potential transfoms
             pointList[x] += MeshObject.transform.position;
@@ -365,17 +306,17 @@ public class GenerateRoad : NetworkBehaviour
 
     void draw4PTCurve(int x, float y)
     {
-        Gizmos.DrawCube(Render4PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], convexHull[x + 3], (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
+        Gizmos.DrawCube(Render4PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], convexHull[x + 3], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
     }
 
     void draw3PTCurve(int x, float y)
     {
-        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
+        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull[x + 2], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
     }
 
     void draw3PTLastCurve(int x, float y)
     {
-        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull.Last(), (float) y), new Vector3((float) 0.25, (float) 0.25, (float) 0.25));
+        Gizmos.DrawCube(Render3PTBezier(convexHull[x], convexHull[x + 1], convexHull.Last(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
     }
 
     float calcAngle(Vector3 previousVector, Vector3 nextVector)
@@ -386,6 +327,60 @@ public class GenerateRoad : NetworkBehaviour
         UnityEngine.Debug.Log(UnityEngine.Mathf.Tan(rise / run));
 
         return UnityEngine.Mathf.Tan(rise / run);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        foreach (Vector3 point in GeneratedPoints.Value.points)
+        {
+            Gizmos.color = UnityEngine.Color.blue;
+            Gizmos.DrawCube(point, new Vector3((float)0.25, (float)0.25, (float)0.25));
+        }
+
+        foreach (Vector3 p in convexHull)
+        {
+            Gizmos.color = UnityEngine.Color.red;
+            Gizmos.DrawCube(p, new Vector3((float)0.35, (float)0.35, (float)0.35));
+        }
+
+        for (int x = 0; x < convexHull.Count(); x++)
+        {
+            Gizmos.color = UnityEngine.Color.green;
+            if (x < convexHull.Count - 1)
+            {
+                Gizmos.DrawLine(convexHull[x], convexHull[x + 1]);
+            }
+            else
+            {
+                Gizmos.color = UnityEngine.Color.yellow;
+                Gizmos.DrawLine(convexHull[convexHull.Count - 1], convexHull[0]);
+            }
+        }
+
+        Gizmos.color = UnityEngine.Color.yellow;
+        double y = 0;
+        while (y < 1)
+        {
+
+            for (int x = 0; x < convexHull.Count; x++)
+            {
+
+                if (convexHull[x] != convexHull.Last())
+                {
+                    Gizmos.DrawCube(Vector3.Lerp(convexHull[x], convexHull[x + 1], (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+                }
+                else
+                {
+                    Gizmos.DrawCube(Vector3.Lerp(convexHull.Last(), convexHull.First(), (float)y), new Vector3((float)0.25, (float)0.25, (float)0.25));
+                }
+            }
+
+            y += .05;
+        }
+
     }
 
 }

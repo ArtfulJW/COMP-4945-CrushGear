@@ -66,13 +66,13 @@ public class Player : NetworkBehaviour
     {
 
         //Transform[] t = GetComponentsInChildren<Transform>();
-        UnityEngine.Debug.Log(GameObject.Find("TrackManager").GetComponent<GenerateRoad>().convexHull[0]);
+        UnityEngine.Debug.Log(GameObject.Find("Goal").transform.position);
         UnityEngine.Debug.Log("HELL: " + transform.parent.position + " " + transform.parent.name);
 
         //This for loop works.
         foreach (Transform t in transform)
         {
-            t.position += GameObject.Find("TrackManager").GetComponent<GenerateRoad>().convexHull[0];
+            t.position += GameObject.Find("Goal").transform.position;
         }
 
         // This one doesnt work
