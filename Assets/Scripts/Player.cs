@@ -60,7 +60,7 @@ public class Player : NetworkBehaviour
             {
                 other.gameObject.SetActive(false);
                 triggerCounter++;
-                UpdateClientServerRpc(triggerCounter, lapCounter);
+                //UpdateClientServerRpc(triggerCounter, lapCounter);
                 processTrigger();
             }
             else if (other.tag == "Goal")
@@ -68,7 +68,7 @@ public class Player : NetworkBehaviour
                 other.gameObject.SetActive(false);
                 lapCounter++;
                 triggerCounter = 0;
-                UpdateClientServerRpc(triggerCounter, lapCounter);
+                //UpdateClientServerRpc(triggerCounter, lapCounter);
                 processTrigger();
                 resetTimer();
             }
@@ -130,9 +130,9 @@ public class Player : NetworkBehaviour
     void processTrigger()
     {
         Debug.Log("Processing Triggers");
-        if (networkTriggerCounter.Value < triggerAmount)
+        if (triggerCounter < triggerAmount)
         {
-            trackInfo.triggers[networkTriggerCounter.Value].gameObject.SetActive(true);
+            trackInfo.triggers[triggerCounter].gameObject.SetActive(true);
         }
         else
         {
